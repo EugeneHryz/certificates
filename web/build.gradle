@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'com.epam.esm'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    implementation project(':service')
+    implementation project(':repository')
+
+    implementation 'org.springframework:spring-web:5.3.14'
+    implementation 'org.springframework:spring-jdbc:5.3.14'
+    implementation 'org.springframework:spring-webmvc:5.3.14'
+
+    implementation 'org.hibernate:hibernate-validator:5.3.6.Final'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

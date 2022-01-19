@@ -1,0 +1,34 @@
+package com.epam.esm.web.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+
+@Configuration
+@EnableWebMvc
+@EnableTransactionManagement
+@ComponentScan({"com.epam.esm.web.controller", "com.epam.esm.service.impl"})
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        builder.configure(new ObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false));
+        ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder().modules(new JavaTimeModule()).build()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+    }
+}
