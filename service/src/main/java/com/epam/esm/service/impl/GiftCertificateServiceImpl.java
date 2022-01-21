@@ -9,8 +9,10 @@ import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
+import com.epam.esm.service.exception.InvalidRequestDataException;
 import com.epam.esm.service.exception.NoSuchElementException;
 import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.validator.SearchOptionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,7 +110,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getCertificates(SearchOption options) throws ServiceException {
+    public List<GiftCertificateDto> getCertificates(String searchParam, String tagName, String sortBy, String sortOrder)
+            throws ServiceException, InvalidRequestDataException {
+
+        SearchOptionValidator validator = new SearchOptionValidator();
+        if (!validator.validateSortType(sortBy) || !validator.validateSortOrder(sortOrder)) {
+            throw new InvalidRequestDataException("Invalid sort parameters");
+        }
+        SearchOption options = new SearchOption(searchParam, tagName, sortBy, sortOrder);
         List<GiftCertificate> certificates;
         try {
             certificates = certificateDao.findCertificates(options);

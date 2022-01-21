@@ -1,8 +1,9 @@
-package com.epam.esm.web.validator;
+package com.epam.esm.service.validator;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// todo: refactor this validator
 public class SearchOptionValidator {
 
     private List<String> allowedSortTypes = new ArrayList<>();

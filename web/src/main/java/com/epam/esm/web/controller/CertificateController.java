@@ -1,13 +1,10 @@
 package com.epam.esm.web.controller;
 
-import com.epam.esm.repository.dao.SearchOption;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.exception.NoSuchElementException;
 import com.epam.esm.service.exception.ServiceException;
-import com.epam.esm.web.exception.Error;
-import com.epam.esm.web.exception.InvalidRequestDataException;
-import com.epam.esm.web.validator.SearchOptionValidator;
+import com.epam.esm.service.exception.InvalidRequestDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -19,8 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/certificates")
 public class CertificateController {
-
-    private static final int RESOURCE_CODE = 1;
 
     private GiftCertificateService certificateService;
 
@@ -41,7 +36,7 @@ public class CertificateController {
     public GiftCertificateDto createGiftCertificate(@Valid @RequestBody GiftCertificateDto gcDto,
                                                     BindingResult result) throws ServiceException, InvalidRequestDataException {
         if (result.hasErrors()) {
-            throw new InvalidRequestDataException(result.getAllErrors().toString());
+            throw new InvalidRequestDataException(result);
         }
         return certificateService.createCertificate(gcDto);
     }
@@ -76,13 +71,7 @@ public class CertificateController {
             @RequestParam(value = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) throws ServiceException, InvalidRequestDataException {
 
-        SearchOptionValidator validator = new SearchOptionValidator();
-        if (!validator.validateSortType(sortBy) || !validator.validateSortOrder(sortOrder)) {
-            throw new InvalidRequestDataException("Invalid request parameter data");
-        }
-
-        SearchOption options = new SearchOption(searchParam, tag, sortBy, sortOrder);
-        return certificateService.getCertificates(options);
+        return certificateService.getCertificates(searchParam, tag, sortBy, sortOrder);
     }
 
     /**
@@ -114,27 +103,9 @@ public class CertificateController {
             throws ServiceException, NoSuchElementException, InvalidRequestDataException {
 
         if (result.hasErrors()) {
-            throw new InvalidRequestDataException(result.getAllErrors().toString());
+            throw new InvalidRequestDataException(result);
         }
         certDto.setId(id);
         return certificateService.updateCertificate(certDto);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Error resourceNotFound(NoSuchElementException e) {
-        return new Error(HttpStatus.NOT_FOUND.value() * 100 + RESOURCE_CODE, e.getMessage());
-    }
-
-    @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Error internalServerError(ServiceException e) {
-        return new Error(HttpStatus.INTERNAL_SERVER_ERROR.value() * 100 + RESOURCE_CODE, e.getMessage());
-    }
-
-    @ExceptionHandler(InvalidRequestDataException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Error badRequestData(InvalidRequestDataException e) {
-        return new Error(HttpStatus.BAD_REQUEST.value() * 100 + RESOURCE_CODE, e.getMessage());
     }
 }

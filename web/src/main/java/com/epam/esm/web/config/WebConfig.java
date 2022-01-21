@@ -19,7 +19,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan({"com.epam.esm.web.controller", "com.epam.esm.service.impl"})
+@ComponentScan({"com.epam.esm.web.controller", "com.epam.esm.service.impl", "com.epam.esm.web.exception.handler"})
 public class WebConfig implements WebMvcConfigurer {
 
     @Override

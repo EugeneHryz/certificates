@@ -1,6 +1,10 @@
-package com.epam.esm.web.exception;
+package com.epam.esm.service.exception;
+
+import org.springframework.validation.BindingResult;
 
 public class InvalidRequestDataException extends Exception {
+
+    private BindingResult bindingResult;
 
     public InvalidRequestDataException() {
         super();
@@ -16,5 +20,13 @@ public class InvalidRequestDataException extends Exception {
 
     public InvalidRequestDataException(Throwable cause) {
         super(cause);
+    }
+
+    public InvalidRequestDataException(BindingResult result) {
+        bindingResult = result;
+    }
+
+    public BindingResult getBindingResult() {
+        return bindingResult;
     }
 }

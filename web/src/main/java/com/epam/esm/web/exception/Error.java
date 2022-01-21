@@ -2,8 +2,8 @@ package com.epam.esm.web.exception;
 
 public class Error {
 
-    private int errorCode;
-    private String errorMessage;
+    private final int errorCode;
+    private final String errorMessage;
 
     public Error(int errorCode, String errorMessage) {
         this.errorCode = errorCode;

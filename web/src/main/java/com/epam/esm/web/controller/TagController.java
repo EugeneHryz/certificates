@@ -4,24 +4,18 @@ import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.NoSuchElementException;
 import com.epam.esm.service.exception.ServiceException;
-import com.epam.esm.web.exception.Error;
-import com.epam.esm.web.exception.InvalidRequestDataException;
+import com.epam.esm.service.exception.InvalidRequestDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/tags")
 public class TagController {
-
-    private static final int RESOURCE_CODE = 2;
 
     private TagService tagService;
 
@@ -84,23 +78,5 @@ public class TagController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTag(@PathVariable int id) throws ServiceException, NoSuchElementException {
         tagService.deleteTag(id);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Error resourceNotFound(NoSuchElementException e) {
-        return new Error(HttpStatus.NOT_FOUND.value() * 100 + RESOURCE_CODE, e.getMessage());
-    }
-
-    @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Error internalServerError(ServiceException e) {
-        return new Error(HttpStatus.INTERNAL_SERVER_ERROR.value() * 100 + RESOURCE_CODE, e.getMessage());
-    }
-
-    @ExceptionHandler(InvalidRequestDataException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Error badRequest(InvalidRequestDataException e) {
-        return new Error(HttpStatus.BAD_REQUEST.value() * 100 + RESOURCE_CODE, e.getMessage());
     }
 }

@@ -1,7 +1,7 @@
 package com.epam.esm.service;
 
-import com.epam.esm.repository.dao.SearchOption;
 import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.exception.InvalidRequestDataException;
 import com.epam.esm.service.exception.NoSuchElementException;
 import com.epam.esm.service.exception.ServiceException;
 
@@ -13,7 +13,8 @@ public interface GiftCertificateService {
 
     GiftCertificateDto getCertificate(int id) throws NoSuchElementException, ServiceException;
 
-    List<GiftCertificateDto> getCertificates(SearchOption options) throws ServiceException;
+    List<GiftCertificateDto> getCertificates(String searchParam, String tagName, String sortBy, String sortOrder)
+            throws ServiceException, InvalidRequestDataException;
 
     void deleteCertificate(int id) throws ServiceException, NoSuchElementException;
 

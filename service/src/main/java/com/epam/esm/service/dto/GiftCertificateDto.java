@@ -15,24 +15,25 @@ public class GiftCertificateDto {
 
     private int id;
 
-    @NotNull
-    @Size(min = 5, max = 200)
+    @NotNull(message = "name cannot be null")
+    @Size(min = 5, max = 200, message = "name must be between 5 and 200 characters in length")
     private String name;
 
-    @Size(min = 5, max = 200)
+    @Size(min = 5, max = 200, message = "duration must be between 5 and 200 characters in length")
     private String description;
 
-    @DecimalMax(value = "10000.0")
-    @DecimalMin(value = "0.1")
+    @DecimalMax(value = "10000.0", message = "price must be less or equal to 10000.0")
+    @DecimalMin(value = "0.1", message = "price must be greater or equal to 0.1")
     private double price;
 
-    @Min(3)
-    @Digits(integer = 10, fraction = 0)
+    @Min(value = 3, message = "duration must be greater or equal to 3")
+    @Max(value = 365, message = "duration must be less or equal to 365")
+    @Digits(integer = 10, fraction = 0, message = "duration must be integer value")
     private int duration;
 
-    @NotNull
+    @NotNull(message = "created cannot be null")
     private LocalDateTime created;
-    @NotNull
+    @NotNull(message = "lastUpdated cannot be null")
     private LocalDateTime lastUpdated;
 
     private List<TagDto> tags;
