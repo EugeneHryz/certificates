@@ -5,8 +5,11 @@ import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.exception.NoSuchElementException;
-import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.dto.mapper.impl.TagModelMapper;
+import com.epam.esm.service.exception.impl.InvalidRequestDataException;
+import com.epam.esm.service.exception.impl.NoSuchElementException;
+import com.epam.esm.service.exception.impl.ServiceException;
+import com.epam.esm.service.validator.QueryParamValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +21,12 @@ import java.util.stream.Collectors;
 public class TagServiceImpl implements TagService {
 
     private TagDao tagDao;
+    private TagModelMapper tagMapper;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao) {
+    public TagServiceImpl(TagDao tagDao, TagModelMapper mapper) {
         this.tagDao = tagDao;
+        tagMapper = mapper;
     }
 
     @Override
@@ -31,7 +36,7 @@ public class TagServiceImpl implements TagService {
             if (existingTag.isPresent()) {
                 throw new ServiceException("Tag with name '" + tagDto.getName() + "' already exists");
             }
-            int generatedId = tagDao.create(new Tag(tagDto.getName()));
+            int generatedId = tagDao.create(tagMapper.toEntity(tagDto));
 
             tagDto.setId(generatedId);
             return tagDto;
@@ -47,19 +52,37 @@ public class TagServiceImpl implements TagService {
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to get tag (id = " + id + ")");
             }
-            return new TagDto(tag.get());
+            return tagMapper.toDto(tag.get());
         } catch (DaoException e) {
             throw new ServiceException("Unable to get tag (id = " + id + ")", e);
         }
     }
 
     @Override
-    public List<TagDto> getAllTags() throws ServiceException {
+    public List<TagDto> getTags(String page, String size) throws ServiceException, InvalidRequestDataException {
+        QueryParamValidator validator = new QueryParamValidator();
+        if (!validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
+            throw new InvalidRequestDataException("Invalid pagination parameters");
+        }
+        int pageNumber = Integer.parseInt(page);
+        int pageSize = Integer.parseInt(size);
+        long count;
         try {
-            List<Tag> tags = tagDao.findAll();
-            return tags.stream().map(TagDto::new).collect(Collectors.toList());
+            // count all tags
+            count = tagDao.getCount();
         } catch (DaoException e) {
-            throw new ServiceException("Unable to get all tags", e);
+            throw new ServiceException("Unable to count all tags", e);
+        }
+
+        // if page number is too big
+        if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
+            throw new InvalidRequestDataException("Invalid pagination parameters");
+        }
+        try {
+            List<Tag> tags = tagDao.getTags(pageSize, pageSize * pageNumber);
+            return tagMapper.toDtoList(tags);
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to get tags", e);
         }
     }
 

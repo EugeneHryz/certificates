@@ -21,8 +21,17 @@ public class DateValidator implements ConstraintValidator<DateValidity, Object> 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         try {
-            LocalDateTime firstDate = LocalDateTime.parse(BeanUtils.getProperty(value, firstDateFieldName));
-            LocalDateTime secondDate = LocalDateTime.parse(BeanUtils.getProperty(value, secondDateFieldName));
+            String firstDateString = BeanUtils.getProperty(value, firstDateFieldName);
+            String secondDateString = BeanUtils.getProperty(value, secondDateFieldName);
+
+            if (firstDateString == null && secondDateString == null) {
+                return true;
+            } else if (firstDateString == null || secondDateString == null) {
+                return false;
+            }
+
+            LocalDateTime firstDate = LocalDateTime.parse(firstDateString);
+            LocalDateTime secondDate = LocalDateTime.parse(secondDateString);
 
             return firstDate.isEqual(secondDate) || firstDate.isBefore(secondDate);
 

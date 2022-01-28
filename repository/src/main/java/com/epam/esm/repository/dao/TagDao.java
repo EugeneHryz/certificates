@@ -12,4 +12,6 @@ public interface TagDao extends BaseDao<Tag> {
     List<Tag> findTagsForCertificate(GiftCertificate cert) throws DaoException;
 
     Optional<Tag> findByName(String name) throws DaoException;
+
+    List<Tag> getTags(int limit, int offset) throws DaoException;
 }

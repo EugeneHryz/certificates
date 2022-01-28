@@ -2,9 +2,11 @@ package com.epam.esm.web.controller;
 
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.exception.NoSuchElementException;
-import com.epam.esm.service.exception.ServiceException;
-import com.epam.esm.service.exception.InvalidRequestDataException;
+import com.epam.esm.service.exception.impl.NoSuchElementException;
+import com.epam.esm.service.exception.impl.ServiceException;
+import com.epam.esm.service.exception.impl.InvalidRequestDataException;
+import com.epam.esm.web.model.GiftCertificateRequestModel;
+import com.epam.esm.web.model.mapper.impl.GiftCertificateModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/certificates")
@@ -19,9 +22,13 @@ public class CertificateController {
 
     private GiftCertificateService certificateService;
 
+    private GiftCertificateModelMapper certificateMapper;
+
     @Autowired
-    public CertificateController(GiftCertificateService certService) {
+    public CertificateController(GiftCertificateService certService,
+                                 GiftCertificateModelMapper certificateMapper) {
         this.certificateService = certService;
+        this.certificateMapper = certificateMapper;
     }
 
     /**
@@ -33,12 +40,14 @@ public class CertificateController {
      */
     @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificateDto createGiftCertificate(@Valid @RequestBody GiftCertificateDto gcDto,
+    public GiftCertificateRequestModel createGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel gcRequestModel,
                                                     BindingResult result) throws ServiceException, InvalidRequestDataException {
         if (result.hasErrors()) {
-            throw new InvalidRequestDataException(result);
+            String errorMessage = extractValidationErrorMessage(result);
+            throw new InvalidRequestDataException(errorMessage);
         }
-        return certificateService.createCertificate(gcDto);
+        GiftCertificateDto gcDto = certificateMapper.toDto(gcRequestModel);
+        return certificateMapper.toRequestModel(certificateService.createCertificate(gcDto));
     }
 
     /**
@@ -50,28 +59,31 @@ public class CertificateController {
      * @throws ServiceException if an error occurs
      */
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    public GiftCertificateDto getGiftCertificate(@PathVariable int id) throws NoSuchElementException, ServiceException {
-        return certificateService.getCertificate(id);
+    public GiftCertificateRequestModel getGiftCertificate(@PathVariable int id) throws NoSuchElementException, ServiceException {
+        return certificateMapper.toRequestModel(certificateService.getCertificate(id));
     }
 
-    /**
-     * get filtered and sorted list of GiftCertificateDto
-     *
-     * @param searchParam search certificates by part of name or description
-     * @param tag search certificates by one tag name associated with them
-     * @param sortBy specifies how certificates will be sorted (date - by last update date, name - by name)
-     * @param sortOrder specifies sort order (asc - ascending, desc - descending)
-     * @return list of GiftCertificateDto
-     * @throws ServiceException if an error occurs
-     */
+//    /**
+//     * get filtered and sorted list of GiftCertificateDto
+//     *
+//     * @param searchParam search certificates by part of name or description
+//     * @param tag search certificates by one tag name associated with them
+//     * @param sortBy specifies how certificates will be sorted (date - by last update date, name - by name)
+//     * @param sortOrder specifies sort order (asc - ascending, desc - descending)
+//     * @return list of GiftCertificateDto
+//     * @throws ServiceException if an error occurs
+//     */
     @GetMapping(produces = {"application/json"})
-    public List<GiftCertificateDto> getAllCertificates(
+    public List<GiftCertificateRequestModel> getCertificates(
             @RequestParam(value = "searchParam", defaultValue = "") String searchParam,
             @RequestParam(value = "tag", defaultValue = "") String tag,
             @RequestParam(value = "sortBy", defaultValue = "date") String sortBy,
-            @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder) throws ServiceException, InvalidRequestDataException {
+            @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder,
+            @RequestParam(value = "page", defaultValue = "0") String page,
+            @RequestParam(value = "size", defaultValue = "2") String size) throws ServiceException, InvalidRequestDataException {
 
-        return certificateService.getCertificates(searchParam, tag, sortBy, sortOrder);
+        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParam, tag, sortBy, sortOrder, page, size);
+        return certificateMapper.toRequestModelList(dtoList);
     }
 
     /**
@@ -98,14 +110,37 @@ public class CertificateController {
      * @throws NoSuchElementException if there's no such certificate with specified id
      */
     @PutMapping("/{id}")
-    public GiftCertificateDto updateGiftCertificate(@Valid @RequestBody GiftCertificateDto certDto,
+    public GiftCertificateRequestModel updateGiftCertificate(@Valid @RequestBody GiftCertificateDto certDto,
                                                     BindingResult result, @PathVariable int id)
             throws ServiceException, NoSuchElementException, InvalidRequestDataException {
 
         if (result.hasErrors()) {
-            throw new InvalidRequestDataException(result);
+            String errorMessage = extractValidationErrorMessage(result);
+            throw new InvalidRequestDataException(errorMessage);
         }
         certDto.setId(id);
-        return certificateService.updateCertificate(certDto);
+        return certificateMapper.toRequestModel(certificateService.updateCertificate(certDto));
+    }
+
+
+//    @PatchMapping("/{id}")
+//    public GiftCertificateDto updateCertificateDuration(@Valid @RequestBody GiftCertificateDurationOnlyDto certDurationDto,
+//                                                        BindingResult result, @PathVariable int id)
+//            throws InvalidRequestDataException, ServiceException, NoSuchElementException {
+//
+//        if (result.hasErrors()) {
+//            String errorMessage = extractValidationErrorMessage(result);
+//            throw new InvalidRequestDataException(errorMessage);
+//        }
+//        certDurationDto.setId(id);
+//        return certificateService.updateCertificateDuration(certDurationDto);
+//    }
+
+    // fixme: duplicated code
+    private String extractValidationErrorMessage(BindingResult bindingResult) {
+        Optional<String> message = bindingResult.getAllErrors().stream()
+                .map(error -> error.getDefaultMessage()).findFirst();
+
+        return message.orElse("No message");
     }
 }

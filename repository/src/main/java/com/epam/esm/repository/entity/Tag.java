@@ -24,7 +24,7 @@ public class Tag extends AbstractEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Tag)) return false;
         Tag tag = (Tag) o;
         return name.equals(tag.name) && getId() == tag.getId();
     }

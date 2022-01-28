@@ -1,24 +1,24 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.dao.SearchOption;
+import com.epam.esm.repository.dto.SearchOption;
 import com.epam.esm.repository.entity.GiftCertificate;
-import static com.epam.esm.repository.dao.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
 
 import com.epam.esm.repository.dao.GiftCertificateDao;
-import com.epam.esm.repository.dao.SqlQueryBuilder;
+import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     private JdbcOperations jdbcOperations;
@@ -80,7 +80,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
         try {
             return Optional.ofNullable(jdbcOperations
-                    .query(queryBuilder.build(), rs -> {
+                    .query(queryBuilder.build(), (rs) -> {
                         if (rs.next()) {
                             return mapGiftCertificate(rs, 1);
                         }
@@ -92,19 +92,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findAll() throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        addSelectClauseForAllColumns(queryBuilder);
-
-        try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapGiftCertificate);
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find all certificates", e);
-        }
-    }
-
-    @Override
-    public List<GiftCertificate> findCertificates(SearchOption options) throws DaoException {
+    public List<GiftCertificate> findCertificates(SearchOption options, int limit, int offset) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         String where = "";
         if (options.getTagName() == null || options.getTagName().isEmpty()) {
@@ -124,10 +112,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         queryBuilder.addWhereClause(where + "(" + CERTIFICATE_NAME + " LIKE '%" + options.getSearchParam() + "%' OR " +
                 CERTIFICATE_DESCRIPTION + " LIKE '%" + options.getSearchParam() + "%')");
         String sortColumn = options.getSortBy().equals("date") ? CERTIFICATE_LAST_UPDATE_DATE : CERTIFICATE_NAME;
-        queryBuilder.addOrderByClause(sortColumn, options.getSortOrder());
+        queryBuilder.addOrderByClause(sortColumn, options.getSortOrder())
+                .addLimitAndOffset();
 
         try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapGiftCertificate);
+            return jdbcOperations.query(queryBuilder.build(), this::mapGiftCertificate, limit, offset);
         } catch (DataAccessException e) {
             throw new DaoException("Unable to find certificates with specified parameters", e);
         }
@@ -180,6 +169,37 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             throw new DaoException("Unable to create certificate-tag mapping (certId = " + certId + ", " +
                     "tagId = " + tagId + ")", e);
         }
+    }
+
+    @Override
+    public long getCount(SearchOption options) throws DaoException {
+        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
+        String where = "";
+        if (options.getTagName() == null || options.getTagName().isEmpty()) {
+            queryBuilder.addSelectCount(CERTIFICATE_TABLE);
+        } else {
+            SqlQueryBuilder subqueryBuilder = new SqlQueryBuilder();
+            subqueryBuilder.addSelectClause(TAG_TABLE, TAG_ID)
+                    .addWhereClause(TAG_NAME + " = '" + options.getTagName() + "'");
+
+            queryBuilder.addSelectCount(CT_MAPPING_TABLE);
+            queryBuilder.addInnerJoinClause(CERTIFICATE_TABLE, CERTIFICATE_TABLE + "." + CERTIFICATE_ID + " = " + CT_MAPPING_CERTIFICATE_ID);
+            where = CT_MAPPING_TAG_ID + " IN (" + subqueryBuilder.build() + ") AND ";
+        }
+
+        queryBuilder.addWhereClause(where + "(" + CERTIFICATE_NAME + " LIKE '%" + options.getSearchParam() + "%' OR " +
+                CERTIFICATE_DESCRIPTION + " LIKE '%" + options.getSearchParam() + "%')");
+        try {
+            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
+            return count != null ? count : -1L;
+        } catch (DataAccessException e) {
+            throw new DaoException("Unable to count gift certificates", e);
+        }
+    }
+
+    @Override
+    public long getCount() throws DaoException {
+        throw new UnsupportedOperationException();
     }
 
     private void addSelectClauseForAllColumns(SqlQueryBuilder queryBuilder) {

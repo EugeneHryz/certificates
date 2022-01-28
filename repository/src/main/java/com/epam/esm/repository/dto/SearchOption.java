@@ -1,4 +1,4 @@
-package com.epam.esm.repository.dao;
+package com.epam.esm.repository.dto;
 
 public class SearchOption {
 

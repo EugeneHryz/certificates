@@ -3,8 +3,6 @@ package com.epam.esm.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -19,7 +17,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan({"com.epam.esm.web.controller", "com.epam.esm.service.impl", "com.epam.esm.web.exception.handler"})
+@ComponentScan({"com.epam.esm.web", "com.epam.esm.service"})
 public class WebConfig implements WebMvcConfigurer {
 
     @Override

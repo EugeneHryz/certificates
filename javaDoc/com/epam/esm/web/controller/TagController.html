@@ -171,12 +171,12 @@ extends java.lang.Object</pre>
 </td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>com.epam.esm.web.exception.Error</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/epam/esm/web/controller/TagController.html#internalServerError-com.epam.esm.service.exception.ServiceException-">internalServerError</a></span>(com.epam.esm.service.exception.ServiceException&nbsp;e)</code>&nbsp;</td>
+<td class="colFirst"><code>com.epam.esm.web.error.Error</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/epam/esm/web/controller/TagController.html#internalServerError-com.epam.esm.service.exception.impl.ServiceException-">internalServerError</a></span>(com.epam.esm.service.exception.impl.ServiceException&nbsp;e)</code>&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
-<td class="colFirst"><code>com.epam.esm.web.exception.Error</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/epam/esm/web/controller/TagController.html#resourceNotFound-com.epam.esm.service.exception.NoSuchElementException-">resourceNotFound</a></span>(com.epam.esm.service.exception.NoSuchElementException&nbsp;e)</code>&nbsp;</td>
+<td class="colFirst"><code>com.epam.esm.web.error.Error</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/epam/esm/web/controller/TagController.html#resourceNotFound-com.epam.esm.service.exception.impl.NoSuchElementException-">resourceNotFound</a></span>(com.epam.esm.service.exception.impl.NoSuchElementException&nbsp;e)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -228,7 +228,7 @@ public&nbsp;TagController(com.epam.esm.service.TagService&nbsp;tagService)</pre>
  @ResponseStatus(value=CREATED)
 public&nbsp;com.epam.esm.service.dto.TagDto&nbsp;createTag(@RequestBody
                                                                                                                              com.epam.esm.service.dto.TagDto&nbsp;tagDto)
-                                                                                                                      throws com.epam.esm.service.exception.ServiceException</pre>
+                                                                                                                      throws com.epam.esm.service.exception.impl.ServiceException</pre>
 <div class="block">create new tag</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -236,7 +236,7 @@ public&nbsp;com.epam.esm.service.dto.TagDto&nbsp;createTag(@RequestBody
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>created TagDto if successful</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>com.epam.esm.service.exception.ServiceException</code> - if an error occurs</dd>
+<dd><code>com.epam.esm.service.exception.impl.ServiceException</code> - if an error occurs</dd>
 </dl>
 </li>
 </ul>
@@ -250,8 +250,8 @@ public&nbsp;com.epam.esm.service.dto.TagDto&nbsp;createTag(@RequestBody
             produces="application/json")
 public&nbsp;com.epam.esm.service.dto.TagDto&nbsp;getTag(@PathVariable
                                                                                                                     int&nbsp;id)
-                                                                                                             throws com.epam.esm.service.exception.NoSuchElementException,
-                                                                                                                    com.epam.esm.service.exception.ServiceException</pre>
+                                                                                                             throws com.epam.esm.service.exception.impl.NoSuchElementException,
+                                                                                                                    com.epam.esm.service.exception.impl.ServiceException</pre>
 <div class="block">get tag by id</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -259,31 +259,31 @@ public&nbsp;com.epam.esm.service.dto.TagDto&nbsp;getTag(@PathVariable
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>TagDto</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>com.epam.esm.service.exception.NoSuchElementException</code> - if there's no such tag with specified id</dd>
-<dd><code>com.epam.esm.service.exception.ServiceException</code> - if an error occurs</dd>
+<dd><code>com.epam.esm.service.exception.impl.NoSuchElementException</code> - if there's no such tag with specified id</dd>
+<dd><code>com.epam.esm.service.exception.impl.ServiceException</code> - if an error occurs</dd>
 </dl>
 </li>
 </ul>
-<a name="resourceNotFound-com.epam.esm.service.exception.NoSuchElementException-">
+<a name="resourceNotFound-com.epam.esm.service.exception.impl.NoSuchElementException-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>resourceNotFound</h4>
-<pre>@ExceptionHandler(value=com.epam.esm.service.exception.NoSuchElementException.class)
+<pre>@ExceptionHandler(value=com.epam.esm.service.exception.impl.NoSuchElementException.class)
  @ResponseStatus(value=NOT_FOUND)
-public&nbsp;com.epam.esm.web.exception.Error&nbsp;resourceNotFound(com.epam.esm.service.exception.NoSuchElementException&nbsp;e)</pre>
+public&nbsp;com.epam.esm.web.error.Error&nbsp;resourceNotFound(com.epam.esm.service.exception.impl.NoSuchElementException&nbsp;e)</pre>
 </li>
 </ul>
-<a name="internalServerError-com.epam.esm.service.exception.ServiceException-">
+<a name="internalServerError-com.epam.esm.service.exception.impl.ServiceException-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>internalServerError</h4>
-<pre>@ExceptionHandler(value=com.epam.esm.service.exception.ServiceException.class)
+<pre>@ExceptionHandler(value=com.epam.esm.service.exception.impl.ServiceException.class)
  @ResponseStatus(value=INTERNAL_SERVER_ERROR)
-public&nbsp;com.epam.esm.web.exception.Error&nbsp;internalServerError(com.epam.esm.service.exception.ServiceException&nbsp;e)</pre>
+public&nbsp;com.epam.esm.web.error.Error&nbsp;internalServerError(com.epam.esm.service.exception.impl.ServiceException&nbsp;e)</pre>
 </li>
 </ul>
 <a name="getAllTags--">
@@ -294,13 +294,13 @@ public&nbsp;com.epam.esm.web.exception.Error&nbsp;internalServerError(com.epam.e
 <h4>getAllTags</h4>
 <pre>@GetMapping(produces="application/json")
 public&nbsp;java.util.List&lt;com.epam.esm.service.dto.TagDto&gt;&nbsp;getAllTags()
-                                                                                                     throws com.epam.esm.service.exception.ServiceException</pre>
+                                                                                                     throws com.epam.esm.service.exception.impl.ServiceException</pre>
 <div class="block">get all tags</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>list of all tags</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>com.epam.esm.service.exception.ServiceException</code> - if an error occurs</dd>
+<dd><code>com.epam.esm.service.exception.impl.ServiceException</code> - if an error occurs</dd>
 </dl>
 </li>
 </ul>
@@ -314,8 +314,8 @@ public&nbsp;java.util.List&lt;com.epam.esm.service.dto.TagDto&gt;&nbsp;getAllTag
                produces="application/json")
 public&nbsp;java.util.Map&lt;java.lang.String,java.lang.Integer&gt;&nbsp;deleteTag(@PathVariable
                                                                                                                                                int&nbsp;id)
-                                                                                                                                        throws com.epam.esm.service.exception.ServiceException,
-                                                                                                                                               com.epam.esm.service.exception.NoSuchElementException</pre>
+                                                                                                                                        throws com.epam.esm.service.exception.impl.ServiceException,
+                                                                                                                                               com.epam.esm.service.exception.impl.NoSuchElementException</pre>
 <div class="block">delete tag by id</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -323,8 +323,8 @@ public&nbsp;java.util.Map&lt;java.lang.String,java.lang.Integer&gt;&nbsp;deleteT
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>deleted tag id, if successful</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>com.epam.esm.service.exception.ServiceException</code> - if an error occurs</dd>
-<dd><code>com.epam.esm.service.exception.NoSuchElementException</code> - if there's no such tag with specified id</dd>
+<dd><code>com.epam.esm.service.exception.impl.ServiceException</code> - if an error occurs</dd>
+<dd><code>com.epam.esm.service.exception.impl.NoSuchElementException</code> - if there's no such tag with specified id</dd>
 </dl>
 </li>
 </ul>

@@ -1,4 +1,4 @@
-package com.epam.esm.web.exception;
+package com.epam.esm.web.error;
 
 public class Error {
 

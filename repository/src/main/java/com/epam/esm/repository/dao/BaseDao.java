@@ -12,9 +12,9 @@ public interface BaseDao<T extends AbstractEntity> {
 
     Optional<T> findById(int id) throws DaoException;
 
-    List<T> findAll() throws DaoException;
-
     boolean deleteById(int id) throws DaoException;
 
     Optional<T> update(T entity) throws DaoException;
+
+    long getCount() throws DaoException;
 }

@@ -1,4 +1,4 @@
-package com.epam.esm.repository.dao;
+package com.epam.esm.repository.dao.query;
 
 import java.util.Arrays;
 
@@ -12,6 +12,9 @@ public class SqlQueryBuilder {
     private static final String UPDATE_STATEMENT = "UPDATE";
     private static final String ORDER_BY_STATEMENT = "ORDER BY";
     private static final String INNER_JOIN_STATEMENT = "INNER JOIN";
+    private static final String LIMIT_STATEMENT = "LIMIT";
+    private static final String OFFSET_STATEMENT = "OFFSET";
+    private static final String COUNT_FUNCTION = "COUNT";
 
     private StringBuilder queryBuilder;
 
@@ -23,7 +26,7 @@ public class SqlQueryBuilder {
         queryBuilder.append(INSERT_STATEMENT)
                 .append(" ")
                 .append(tableName)
-                .append(" (");
+                .append("(");
 
         Arrays.stream(columnNames).forEach((column) -> {
             queryBuilder.append(column);
@@ -58,6 +61,17 @@ public class SqlQueryBuilder {
             }
         });
         queryBuilder.append("FROM ")
+                .append(tableName);
+
+        return this;
+    }
+
+    public SqlQueryBuilder addSelectCount(String tableName) {
+        queryBuilder.append(SELECT_STATEMENT)
+                .append(" ")
+                .append(COUNT_FUNCTION)
+                .append("(*) ")
+                .append("FROM ")
                 .append(tableName);
 
         return this;
@@ -116,6 +130,16 @@ public class SqlQueryBuilder {
                 .append(WHERE_STATEMENT)
                 .append(" ")
                 .append(conditions);
+
+        return this;
+    }
+
+    public SqlQueryBuilder addLimitAndOffset() {
+        queryBuilder.append(" ")
+                .append(LIMIT_STATEMENT)
+                .append(" ? ")
+                .append(OFFSET_STATEMENT)
+                .append(" ?");
 
         return this;
     }

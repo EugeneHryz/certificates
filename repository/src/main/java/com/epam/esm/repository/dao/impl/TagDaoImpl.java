@@ -2,17 +2,16 @@ package com.epam.esm.repository.dao.impl;
 
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
-import static com.epam.esm.repository.dao.DatabaseColumn.*;
-import com.epam.esm.repository.dao.SqlQueryBuilder;
+import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
-import com.epam.esm.repository.exception.OperationNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +20,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Repository
 public class TagDaoImpl implements TagDao {
 
     private JdbcOperations jdbcOperations;
@@ -69,12 +68,13 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll() throws DaoException {
+    public List<Tag> getTags(int limit, int offset) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(TAG_TABLE, TAG_ID, TAG_NAME);
+        queryBuilder.addSelectClause(TAG_TABLE, TAG_ID, TAG_NAME)
+                .addLimitAndOffset();
 
         try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapTag);
+            return jdbcOperations.query(queryBuilder.build(), this::mapTag, limit, offset);
         } catch (DataAccessException e) {
             throw new DaoException("Unable to find all tags", e);
         }
@@ -95,7 +95,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> update(Tag entity) {
-        throw new OperationNotSupportedException("Update operation not supported for tags");
+        throw new UnsupportedOperationException("Update operation is not supported for tags");
     }
 
     @Override
@@ -127,6 +127,19 @@ public class TagDaoImpl implements TagDao {
             return jdbcOperations.query(queryBuilder.build(), this::mapTag, cert.getId());
         } catch (DataAccessException e) {
             throw new DaoException("Unable to find tags for certificate (id = " + cert.getId() + ")", e);
+        }
+    }
+
+    @Override
+    public long getCount() throws DaoException {
+        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
+        queryBuilder.addSelectCount(TAG_TABLE);
+
+        try {
+            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
+            return count != null ? count : -1L;
+        } catch (DataAccessException e) {
+            throw new DaoException("Unable to get tag count", e);
         }
     }
 
