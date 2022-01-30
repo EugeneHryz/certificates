@@ -6,29 +6,28 @@ public class NoSuchElementException extends Exception implements ResourceCodeAcc
 
     private int resourceCode;
 
-    public NoSuchElementException() {
+    public NoSuchElementException(int resourceCode) {
         super();
+        this.resourceCode = resourceCode;
     }
 
-    public NoSuchElementException(String message) {
+    public NoSuchElementException(String message, int resourceCode) {
         super(message);
+        this.resourceCode = resourceCode;
     }
 
-    public NoSuchElementException(String message, Throwable cause) {
+    public NoSuchElementException(String message, Throwable cause, int resourceCode) {
         super(message, cause);
+        this.resourceCode = resourceCode;
     }
 
-    public NoSuchElementException(Throwable cause) {
+    public NoSuchElementException(Throwable cause, int resourceCode) {
         super(cause);
+        this.resourceCode = resourceCode;
     }
 
     @Override
     public int getResourceCode() {
         return resourceCode;
-    }
-
-    @Override
-    public void setResourceCode(int code) {
-        resourceCode = code;
     }
 }

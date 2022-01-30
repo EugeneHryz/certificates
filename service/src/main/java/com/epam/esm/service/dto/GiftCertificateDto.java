@@ -1,7 +1,6 @@
 package com.epam.esm.service.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,7 +77,7 @@ public class GiftCertificateDto extends AbstractDto {
     }
 
     public List<TagDto> getTags() {
-        return new ArrayList<>(tags);
+        return tags;
     }
 
     public void setTags(List<TagDto> tags) {

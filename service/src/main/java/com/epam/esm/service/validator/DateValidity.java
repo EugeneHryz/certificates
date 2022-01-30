@@ -12,14 +12,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface DateValidity {
 
-    String message() default "{com.epam.esm.service.validator.dateValidity}";
-
+    String message() default "Invalid";
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
-
-
     String firstDate();
-
     String secondDate();
 }

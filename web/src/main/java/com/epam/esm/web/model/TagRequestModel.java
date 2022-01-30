@@ -8,8 +8,8 @@ public class TagRequestModel {
 
     private int id;
 
-    @NotNull
-    @Size(min = 3, max = 100)
+    @NotNull(message = "name cannot be null")
+    @Size(min = 3, max = 100, message = "name must be between 3 and 100 characters long")
     private String name;
 
     public TagRequestModel() {

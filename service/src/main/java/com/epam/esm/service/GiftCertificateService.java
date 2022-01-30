@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface GiftCertificateService {
 
-    GiftCertificateDto createCertificate(GiftCertificateDto gcDto) throws ServiceException;
+    GiftCertificateDto createCertificate(GiftCertificateDto gcDto) throws ServiceException, InvalidRequestDataException;
 
     GiftCertificateDto getCertificate(int id) throws NoSuchElementException, ServiceException;
 
@@ -18,7 +18,7 @@ public interface GiftCertificateService {
 
     void deleteCertificate(int id) throws ServiceException, NoSuchElementException;
 
-    GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException;
+    GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException, InvalidRequestDataException;
 
 //    GiftCertificateDto updateCertificateDuration(GiftCertificateDurationOnlyDto certDurationDto)
 //            throws ServiceException, NoSuchElementException;

@@ -6,7 +6,7 @@ import com.epam.esm.service.dto.AbstractDto;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface ModelMapper<E extends AbstractEntity, D extends AbstractDto> {
+public interface DtoMapper<E extends AbstractEntity, D extends AbstractDto> {
 
     E toEntity(D dto);
 

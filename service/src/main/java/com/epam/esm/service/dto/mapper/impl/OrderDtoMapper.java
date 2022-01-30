@@ -2,11 +2,11 @@ package com.epam.esm.service.dto.mapper.impl;
 
 import com.epam.esm.repository.entity.Order;
 import com.epam.esm.service.dto.OrderDto;
-import com.epam.esm.service.dto.mapper.ModelMapper;
+import com.epam.esm.service.dto.mapper.DtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderModelMapper implements ModelMapper<Order, OrderDto> {
+public class OrderDtoMapper implements DtoMapper<Order, OrderDto> {
 
     @Override
     public Order toEntity(OrderDto dto) {

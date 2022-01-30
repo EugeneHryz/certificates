@@ -6,29 +6,28 @@ public class ServiceException extends Exception implements ResourceCodeAccess {
 
     private int resourceCode;
 
-    public ServiceException() {
+    public ServiceException(int resourceCode) {
         super();
+        this.resourceCode = resourceCode;
     }
 
-    public ServiceException(String message) {
+    public ServiceException(String message, int resourceCode) {
         super(message);
+        this.resourceCode = resourceCode;
     }
 
-    public ServiceException(String message, Throwable cause) {
+    public ServiceException(String message, Throwable cause, int resourceCode) {
         super(message, cause);
+        this.resourceCode = resourceCode;
     }
 
-    public ServiceException(Throwable cause) {
+    public ServiceException(Throwable cause, int resourceCode) {
         super(cause);
+        this.resourceCode = resourceCode;
     }
 
     @Override
     public int getResourceCode() {
         return resourceCode;
-    }
-
-    @Override
-    public void setResourceCode(int code) {
-        resourceCode = code;
     }
 }

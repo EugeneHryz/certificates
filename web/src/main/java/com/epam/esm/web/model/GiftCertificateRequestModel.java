@@ -1,50 +1,46 @@
 package com.epam.esm.web.model;
 
-import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.validator.DateValidity;
+import com.epam.esm.service.validator.FieldValidity;
 
-import javax.validation.constraints.*;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-@DateValidity(firstDate = "created", secondDate = "lastUpdated", message = "lastUpdateDate cannot be " +
-        "before createDate. And one of the dates cannot be null")
+@DateValidity(firstDate = "created", secondDate = "lastUpdated",
+        message = "'created' date cannot be after 'lastUpdated' date")
 public class GiftCertificateRequestModel {
 
     private int id;
 
-    @NotNull(message = "name cannot be null")
-    @Size(min = 5, max = 200, message = "name must be between 5 and 200 characters in length")
+    @FieldValidity(leftLimit = "5", rightLimit = "200",
+            message = "name must be between 5 and 200 characters in length. (null if need to be unchanged)")
     private String name;
 
-    @Size(min = 5, max = 200, message = "duration must be between 5 and 200 characters in length")
+    @FieldValidity(leftLimit = "5", rightLimit = "200",
+            message = "duration must be between 5 and 200 characters in length. (null if need to be unchanged)")
     private String description;
 
-    @DecimalMax(value = "10000.0", message = "price must be less or equal to 10000.0")
-    @DecimalMin(value = "0.1", message = "price must be greater or equal to 0.1")
+    @FieldValidity(leftLimit = "0.5", rightLimit = "10000.0",
+            message = "price must be between 0.5 and 10000.0. (value 0.0 if need to be unchanged)")
     private double price;
 
-    @Min(value = 3, message = "duration must be greater or equal to 3")
-    @Max(value = 365, message = "duration must be less or equal to 365")
-    @Digits(integer = 10, fraction = 0, message = "duration must be integer value")
+    @FieldValidity(leftLimit = "3", rightLimit = "365",
+            message = "duration must be between 3 and 365. (value 0 if need to be unchanged)")
     private int duration;
 
-    @NotNull(message = "created date cannot be null")
     private LocalDateTime created;
-
-    @NotNull(message = "lastUpdated date cannot be null")
     private LocalDateTime lastUpdated;
 
-    private List<TagDto> tags;
+    @Valid
+    private List<TagRequestModel> tags;
 
     public GiftCertificateRequestModel() {
     }
 
     public GiftCertificateRequestModel(int id, String name, String description, double price, int duration,
-                              LocalDateTime created, LocalDateTime lastUpdated, List<TagDto> tags) {
+                                       LocalDateTime created, LocalDateTime lastUpdated, List<TagRequestModel> tags) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -111,11 +107,11 @@ public class GiftCertificateRequestModel {
         this.lastUpdated = lastUpdated;
     }
 
-    public List<TagDto> getTags() {
-        return new ArrayList<>(tags);
+    public List<TagRequestModel> getTags() {
+        return tags;
     }
 
-    public void setTags(List<TagDto> tags) {
+    public void setTags(List<TagRequestModel> tags) {
         this.tags = tags;
     }
 

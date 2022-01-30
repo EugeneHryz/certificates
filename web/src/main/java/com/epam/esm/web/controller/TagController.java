@@ -5,6 +5,7 @@ import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
+import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.web.model.TagRequestModel;
 import com.epam.esm.web.model.mapper.impl.TagModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class TagController {
 
         if (result.hasErrors()) {
             String errorMessage = extractValidationErrorMessage(result);
-            throw new InvalidRequestDataException(errorMessage);
+            throw new InvalidRequestDataException(errorMessage, TagServiceImpl.TAG_CODE);
         }
         TagDto tagDto = tagMapper.toDto(tagRequestModel);
         return tagMapper.toRequestModel(tagService.createTag(tagDto));

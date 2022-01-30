@@ -2,11 +2,11 @@ package com.epam.esm.service.dto.mapper.impl;
 
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.dto.mapper.ModelMapper;
+import com.epam.esm.service.dto.mapper.DtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TagModelMapper implements ModelMapper<Tag, TagDto> {
+public class TagDtoMapper implements DtoMapper<Tag, TagDto> {
 
     @Override
     public Tag toEntity(TagDto dto) {
@@ -18,7 +18,7 @@ public class TagModelMapper implements ModelMapper<Tag, TagDto> {
     @Override
     public TagDto toDto(Tag entity) {
         TagDto tagDto = new TagDto(entity.getName());
-        tagDto.setId(tagDto.getId());
+        tagDto.setId(entity.getId());
         return tagDto;
     }
 }

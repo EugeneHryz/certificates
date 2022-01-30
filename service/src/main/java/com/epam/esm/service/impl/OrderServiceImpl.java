@@ -3,13 +3,11 @@ package com.epam.esm.service.impl;
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.dao.OrderDao;
 import com.epam.esm.repository.dao.UserDao;
-import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Order;
-import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.dto.OrderDto;
-import com.epam.esm.service.dto.mapper.impl.OrderModelMapper;
+import com.epam.esm.service.dto.mapper.impl.OrderDtoMapper;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
@@ -17,23 +15,21 @@ import com.epam.esm.service.validator.QueryParamValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderServiceImpl implements OrderService {
 
+    public static final int ORDER_CODE = 4;
+
     private OrderDao orderDao;
     private UserDao userDao;
     private GiftCertificateDao certificateDao;
-
-    private OrderModelMapper orderMapper;
+    private OrderDtoMapper orderMapper;
 
     @Autowired
     public OrderServiceImpl(OrderDao orderDao, UserDao userDao,
-                            GiftCertificateDao certificateDao, OrderModelMapper orderMapper) {
+                            GiftCertificateDao certificateDao, OrderDtoMapper orderMapper) {
         this.orderDao = orderDao;
         this.userDao = userDao;
         this.certificateDao = certificateDao;
@@ -71,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getUserOrders(int userId, String page, String size) throws ServiceException, NoSuchElementException, InvalidRequestDataException {
         QueryParamValidator validator = new QueryParamValidator();
         if (!validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid pagination parameters");
+            throw new InvalidRequestDataException("Invalid pagination parameters", ORDER_CODE);
         }
         int pageNumber = Integer.parseInt(page);
         int pageSize = Integer.parseInt(size);
@@ -79,13 +75,13 @@ public class OrderServiceImpl implements OrderService {
             long count = orderDao.getUserOrderCount(userId);
 
             if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
-                throw new InvalidRequestDataException("Invalid pagination parameters");
+                throw new InvalidRequestDataException("Invalid pagination parameters", ORDER_CODE);
             }
 
             List<Order> userOrders = orderDao.getUserOrders(userId, pageSize, pageNumber * pageSize);
             return orderMapper.toDtoList(userOrders);
         } catch (DaoException e) {
-            throw new ServiceException("Unable to get user orders", e);
+            throw new ServiceException("Unable to get user orders", e, ORDER_CODE);
         }
     }
 }

@@ -2,11 +2,11 @@ package com.epam.esm.service.dto.mapper.impl;
 
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.dto.mapper.ModelMapper;
+import com.epam.esm.service.dto.mapper.DtoMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GiftCertificateModelMapper implements ModelMapper<GiftCertificate, GiftCertificateDto> {
+public class GiftCertificateDtoMapper implements DtoMapper<GiftCertificate, GiftCertificateDto> {
 
     @Override
     public GiftCertificate toEntity(GiftCertificateDto dto) {

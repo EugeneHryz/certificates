@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.repository.dto.SearchOption;
+import com.epam.esm.repository.searchoption.SearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.dao.GiftCertificateDao;
@@ -9,8 +9,8 @@ import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.dto.mapper.impl.GiftCertificateModelMapper;
-import com.epam.esm.service.dto.mapper.impl.TagModelMapper;
+import com.epam.esm.service.dto.mapper.impl.GiftCertificateDtoMapper;
+import com.epam.esm.service.dto.mapper.impl.TagDtoMapper;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
@@ -27,15 +27,17 @@ import java.util.Optional;
 @Component
 public class GiftCertificateServiceImpl implements GiftCertificateService {
 
+    public static final int CERTIFICATE_CODE = 1;
+
     private GiftCertificateDao certificateDao;
     private TagDao tagDao;
 
-    private GiftCertificateModelMapper certificateMapper;
-    private TagModelMapper tagMapper;
+    private GiftCertificateDtoMapper certificateMapper;
+    private TagDtoMapper tagMapper;
 
     @Autowired
     public GiftCertificateServiceImpl(GiftCertificateDao certificateDao, TagDao tagDao,
-                                      GiftCertificateModelMapper certMapper, TagModelMapper tagMapper) {
+                                      GiftCertificateDtoMapper certMapper, TagDtoMapper tagMapper) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
         certificateMapper = certMapper;
@@ -44,17 +46,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Transactional
     @Override
-    public GiftCertificateDto createCertificate(GiftCertificateDto gcDto) throws ServiceException {
+    public GiftCertificateDto createCertificate(GiftCertificateDto gcDto) throws ServiceException, InvalidRequestDataException {
         int generatedId;
         try {
             Optional<GiftCertificate> existingCert = certificateDao.findByName(gcDto.getName());
             if (existingCert.isPresent()) {
-                throw new ServiceException("Certificate with name '" + gcDto.getName() + "' already exists");
+                throw new ServiceException("Certificate with name '" + gcDto.getName() + "' already exists", CERTIFICATE_CODE);
+            }
+            LocalDateTime currentDate = LocalDateTime.now();
+            if (gcDto.getCreated() != null && gcDto.getCreated().isAfter(currentDate)) {
+                throw new InvalidRequestDataException("'created' date cannot be in the future", CERTIFICATE_CODE);
             }
             generatedId = certificateDao.create(certificateMapper.toEntity(gcDto));
             gcDto.setId(generatedId);
         } catch (DaoException e) {
-            throw new ServiceException("Unable to create certificate", e);
+            throw new ServiceException("Unable to create certificate", e, CERTIFICATE_CODE);
         }
 
         if (gcDto.getTags() != null && !gcDto.getTags().isEmpty()) {
@@ -69,7 +75,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     }
                 } catch (DaoException e) {
                     throw new ServiceException("Unable to find or create tag " + tag.getName() +
-                            " for certificate", e);
+                            " for certificate", e, CERTIFICATE_CODE);
                 }
                 tag.setId(id);
             }
@@ -81,7 +87,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     }
                 }
             } catch (DaoException e) {
-                throw new ServiceException("Error occurred during certificate creation", e);
+                throw new ServiceException("Error occurred during certificate creation", e, CERTIFICATE_CODE);
             }
         }
         return gcDto;
@@ -93,7 +99,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         try {
             cert = certificateDao.findById(id);
         } catch (DaoException e) {
-            throw new ServiceException("Unable to find certificate (id = " + id + ")", e);
+            throw new ServiceException("Unable to find certificate (id = " + id + ")", e, CERTIFICATE_CODE);
         }
 
         GiftCertificateDto gcDto;
@@ -104,12 +110,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             try {
                 tags = tagDao.findTagsForCertificate(cert.get());
             } catch (DaoException e) {
-                throw new ServiceException("Unable to find tags for certificate with id = " + cert.get().getId(), e);
+                throw new ServiceException("Unable to find tags for certificate with id = " +
+                        cert.get().getId(), e, CERTIFICATE_CODE);
             }
             List<TagDto> tagsDto = tagMapper.toDtoList(tags);
             gcDto.setTags(tagsDto);
         } else {
-            throw new NoSuchElementException("Unable to get certificate (id = " + id + ")");
+            throw new NoSuchElementException("Unable to get certificate (id = " + id + ")", CERTIFICATE_CODE);
         }
         return gcDto;
     }
@@ -121,9 +128,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         QueryParamValidator validator = new QueryParamValidator();
         if (!validator.validateSortType(sortBy) || !validator.validateSortOrder(sortOrder)
                 || !validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid query parameters");
+            throw new InvalidRequestDataException("Invalid query parameters", CERTIFICATE_CODE);
         }
-        SearchOption options = new SearchOption(searchParam, tagName, sortBy, sortOrder);
+        SearchParameter options = new SearchParameter(searchParam, tagName, sortBy, sortOrder);
         int pageNumber = Integer.parseInt(page);
         int pageSize = Integer.parseInt(size);
         List<GiftCertificate> certificates;
@@ -132,11 +139,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             long count = certificateDao.getCount(options);
             // if page number is too big
             if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
-                throw new InvalidRequestDataException("Invalid pagination parameters");
+                throw new InvalidRequestDataException("Invalid pagination parameters", CERTIFICATE_CODE);
             }
             certificates = certificateDao.findCertificates(options, pageSize, pageNumber * pageSize);
         } catch (DaoException e) {
-            throw new ServiceException("Unable to get certificates", e);
+            throw new ServiceException("Unable to get certificates", e, CERTIFICATE_CODE);
         }
 
         List<GiftCertificateDto> result = new ArrayList<>();
@@ -147,7 +154,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             try {
                 tags = tagDao.findTagsForCertificate(cert);
             } catch (DaoException e) {
-                throw new ServiceException("Unable to find tags for certificate with id = " + cert.getId(), e);
+                throw new ServiceException("Unable to find tags for certificate with id = "
+                        + cert.getId(), e, CERTIFICATE_CODE);
             }
             List<TagDto> tagsDto = tagMapper.toDtoList(tags);
             certDto.setTags(tagsDto);
@@ -160,46 +168,49 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public void deleteCertificate(int id) throws ServiceException, NoSuchElementException {
         try {
             if (!certificateDao.deleteById(id)) {
-                throw new NoSuchElementException("Unable to delete certificate (id = " + id + ")");
+                throw new NoSuchElementException("Unable to delete certificate (id = " + id + ")", CERTIFICATE_CODE);
             }
         } catch (DaoException e) {
-            throw new ServiceException("Unable to delete certificate (id = " + id + ")", e);
+            throw new ServiceException("Unable to delete certificate (id = " + id + ")", e, CERTIFICATE_CODE);
         }
     }
 
     @Transactional
     @Override
-    public GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException {
+    public GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException, InvalidRequestDataException {
         Optional<GiftCertificate> oldCert;
         try {
             oldCert = certificateDao.findById(certDto.getId());
             // check if certificate with given id exists
             if (!oldCert.isPresent()) {
-                throw new NoSuchElementException("Unable to update certificate (id = " + certDto.getId() + ")");
+                throw new NoSuchElementException("Unable to update certificate (id = "
+                        + certDto.getId() + ")", CERTIFICATE_CODE);
             }
             GiftCertificate newCert = oldCert.get();
 
             // get all tags associated with that certificate
             List<Tag> existingTags = tagDao.findTagsForCertificate(newCert);
 
-            for (TagDto newTag : certDto.getTags()) {
-                Optional<Tag> tag = tagDao.findByName(newTag.getName());
+            if (certDto.getTags() != null) {
+                for (TagDto newTag : certDto.getTags()) {
+                    Optional<Tag> tag = tagDao.findByName(newTag.getName());
 
-                // if supplied tag already exists
-                if (tag.isPresent()) {
+                    // if supplied tag already exists
+                    if (tag.isPresent()) {
 
-                    // if the certificate is not associated with that tag
-                    if (existingTags.stream().noneMatch(t -> t.equals(tag.get()))) {
-                        // create mapping
-                        certificateDao.createCertificateTagMapping(newCert.getId(), tag.get().getId());
-                    }
-                } else {    // if supplied tag doesn't exist
-                    // create new tag
-                    int generatedId = tagDao.create(new Tag(newTag.getName()));
-                    if (generatedId > 0) {
+                        // if the certificate is not associated with that tag
+                        if (existingTags.stream().noneMatch(t -> t.equals(tag.get()))) {
+                            // create mapping
+                            certificateDao.createCertificateTagMapping(newCert.getId(), tag.get().getId());
+                        }
+                    } else {    // if supplied tag doesn't exist
+                        // create new tag
+                        int generatedId = tagDao.create(new Tag(newTag.getName()));
+                        if (generatedId > 0) {
 
-                        // create mapping for that tag
-                        certificateDao.createCertificateTagMapping(newCert.getId(), generatedId);
+                            // create mapping for that tag
+                            certificateDao.createCertificateTagMapping(newCert.getId(), generatedId);
+                        }
                     }
                 }
             }
@@ -216,15 +227,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             if (certDto.getDuration() != 0) {
                 newCert.setDuration(certDto.getDuration());
             }
+            // lastUpdated date is automatically updated
             newCert.setLastUpdated(LocalDateTime.now());
             Optional<GiftCertificate> updatedCert = certificateDao.update(newCert);
             if (updatedCert.isPresent()) {
                 return constructCertificateDto(updatedCert.get());
             } else {
-                throw new ServiceException("Something went wrong while updating certificate (id = " + newCert.getId() + ")");
+                throw new ServiceException("Something went wrong while updating certificate (id = "
+                        + newCert.getId() + ")", CERTIFICATE_CODE);
             }
         } catch (DaoException e) {
-            throw new ServiceException("Error while updating certificate with id = " + certDto.getId(), e);
+            throw new ServiceException("Error while updating certificate with id = "
+                    + certDto.getId(), e, CERTIFICATE_CODE);
         }
     }
 

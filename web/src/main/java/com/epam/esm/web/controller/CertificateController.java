@@ -5,6 +5,7 @@ import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
+import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.mapper.impl.GiftCertificateModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class CertificateController {
                                                     BindingResult result) throws ServiceException, InvalidRequestDataException {
         if (result.hasErrors()) {
             String errorMessage = extractValidationErrorMessage(result);
-            throw new InvalidRequestDataException(errorMessage);
+            throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
         GiftCertificateDto gcDto = certificateMapper.toDto(gcRequestModel);
         return certificateMapper.toRequestModel(certificateService.createCertificate(gcDto));
@@ -110,16 +111,17 @@ public class CertificateController {
      * @throws NoSuchElementException if there's no such certificate with specified id
      */
     @PutMapping("/{id}")
-    public GiftCertificateRequestModel updateGiftCertificate(@Valid @RequestBody GiftCertificateDto certDto,
+    public GiftCertificateRequestModel updateGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel certRequestModel,
                                                     BindingResult result, @PathVariable int id)
             throws ServiceException, NoSuchElementException, InvalidRequestDataException {
 
         if (result.hasErrors()) {
             String errorMessage = extractValidationErrorMessage(result);
-            throw new InvalidRequestDataException(errorMessage);
+            throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
-        certDto.setId(id);
-        return certificateMapper.toRequestModel(certificateService.updateCertificate(certDto));
+        certRequestModel.setId(id);
+        GiftCertificateDto dto = certificateService.updateCertificate(certificateMapper.toDto(certRequestModel));
+        return certificateMapper.toRequestModel(dto);
     }
 
 

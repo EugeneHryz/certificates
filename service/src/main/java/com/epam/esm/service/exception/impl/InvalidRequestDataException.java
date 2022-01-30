@@ -6,29 +6,28 @@ public class InvalidRequestDataException extends Exception implements ResourceCo
 
     private int resourceCode;
 
-    public InvalidRequestDataException() {
+    public InvalidRequestDataException(int resourceCode) {
         super();
+        this.resourceCode = resourceCode;
     }
 
-    public InvalidRequestDataException(String message) {
+    public InvalidRequestDataException(String message, int resourceCode) {
         super(message);
+        this.resourceCode = resourceCode;
     }
 
-    public InvalidRequestDataException(String message, Throwable cause) {
+    public InvalidRequestDataException(String message, Throwable cause, int resourceCode) {
         super(message, cause);
+        this.resourceCode = resourceCode;
     }
 
-    public InvalidRequestDataException(Throwable cause) {
+    public InvalidRequestDataException(Throwable cause, int resourceCode) {
         super(cause);
+        this.resourceCode = resourceCode;
     }
 
     @Override
     public int getResourceCode() {
         return resourceCode;
-    }
-
-    @Override
-    public void setResourceCode(int code) {
-        resourceCode = code;
     }
 }

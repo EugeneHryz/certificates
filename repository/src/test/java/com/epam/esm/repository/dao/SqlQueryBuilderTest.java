@@ -1,11 +1,13 @@
 package com.epam.esm.repository.dao;
 
+import com.epam.esm.repository.dao.query.DatabaseColumn;
+import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.epam.esm.repository.dao.DatabaseColumn.*;
-import static com.epam.esm.repository.dao.DatabaseColumn.CERTIFICATE_DURATION;
+import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseColumn.CERTIFICATE_DURATION;
 
 public class SqlQueryBuilderTest {
 

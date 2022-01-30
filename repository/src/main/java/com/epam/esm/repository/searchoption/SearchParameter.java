@@ -1,6 +1,6 @@
-package com.epam.esm.repository.dto;
+package com.epam.esm.repository.searchoption;
 
-public class SearchOption {
+public class SearchParameter {
 
     private String searchParam;
     private String tagName;
@@ -8,7 +8,7 @@ public class SearchOption {
     private String sortBy;
     private String sortOrder;
 
-    public SearchOption(String searchParam, String tagName, String sortBy, String sortOrder) {
+    public SearchParameter(String searchParam, String tagName, String sortBy, String sortOrder) {
         this.searchParam = searchParam;
         this.tagName = tagName;
         this.sortBy = sortBy;

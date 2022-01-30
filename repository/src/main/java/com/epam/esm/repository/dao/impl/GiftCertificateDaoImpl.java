@@ -1,6 +1,6 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.dto.SearchOption;
+import com.epam.esm.repository.searchoption.SearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
 import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
 
@@ -92,7 +92,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findCertificates(SearchOption options, int limit, int offset) throws DaoException {
+    public List<GiftCertificate> findCertificates(SearchParameter options, int limit, int offset) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         String where = "";
         if (options.getTagName() == null || options.getTagName().isEmpty()) {
@@ -172,7 +172,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public long getCount(SearchOption options) throws DaoException {
+    public long getCount(SearchParameter options) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         String where = "";
         if (options.getTagName() == null || options.getTagName().isEmpty()) {

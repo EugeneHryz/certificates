@@ -1,6 +1,6 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.dao.SearchOption;
+import com.epam.esm.repository.searchoption.SearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.exception.DaoException;
@@ -13,7 +13,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public class GiftCertificateDaoImplTest {
@@ -95,7 +94,7 @@ public class GiftCertificateDaoImplTest {
                 LocalDateTime.parse("2005-10-11T19:01:30"), LocalDateTime.parse("2005-10-11T19:01:30"));
         expected.setId(0);
 
-        SearchOption options = new SearchOption("Free", "", "date", "asc");
+        SearchParameter options = new SearchParameter("Free", "", "date", "asc");
         GiftCertificate actual = certificateDao.findCertificates(options).get(0);
 
         Assertions.assertEquals(expected, actual);
