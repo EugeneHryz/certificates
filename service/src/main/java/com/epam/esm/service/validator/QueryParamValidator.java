@@ -31,15 +31,15 @@ public class QueryParamValidator {
         return number.matches(POSITIVE_INTEGER_REGEX);
     }
 
-    public boolean validatePaginationParams(int pageNumber, int pageSize, long elementCount) {
-        boolean result = false;
-        if (pageSize != 0) {
-            int numberOfPages = (int)(elementCount / pageSize);
-            if (elementCount % pageSize != 0) {
-                numberOfPages++;
-            }
-            result = pageNumber < numberOfPages;
-        }
-        return result;
-    }
+//    public boolean validatePaginationParams(int pageNumber, int pageSize, long elementCount) {
+//        boolean result = false;
+//        if (pageSize != 0) {
+//            int numberOfPages = (int)(elementCount / pageSize);
+//            if (elementCount % pageSize != 0) {
+//                numberOfPages++;
+//            }
+//            result = pageNumber < numberOfPages;
+//        }
+//        return result;
+//    }
 }

@@ -8,7 +8,7 @@ public class OrderDto extends AbstractDto {
     private int userId;
     private int certificateId;
     private double total;
-    private LocalDateTime date;
+    private LocalDateTime purchaseDate;
 
     public OrderDto() {
     }
@@ -17,7 +17,7 @@ public class OrderDto extends AbstractDto {
         this.userId = userId;
         this.certificateId = certificateId;
         this.total = total;
-        this.date = date;
+        this.purchaseDate = date;
     }
 
     public int getUserId() {
@@ -44,12 +44,12 @@ public class OrderDto extends AbstractDto {
         this.total = total;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     @Override
@@ -58,11 +58,11 @@ public class OrderDto extends AbstractDto {
         if (!(o instanceof OrderDto)) return false;
         OrderDto orderDto = (OrderDto) o;
         return getId() == orderDto.getId() && userId == orderDto.userId && certificateId == orderDto.certificateId
-                && Double.compare(orderDto.total, total) == 0 && Objects.equals(date, orderDto.date);
+                && Double.compare(orderDto.total, total) == 0 && Objects.equals(purchaseDate, orderDto.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), userId, certificateId, total, date);
+        return Objects.hash(getId(), userId, certificateId, total, purchaseDate);
     }
 }

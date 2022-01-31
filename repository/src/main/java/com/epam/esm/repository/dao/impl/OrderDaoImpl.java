@@ -63,27 +63,22 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public long getCount() throws DaoException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public long getUserOrderCount(int userId) throws DaoException {
+    public Optional<Order> findById(int id) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectCount(ORDER_TABLE)
-                .addWhereClause(ORDER_USER_ID + " = ?");
+        queryBuilder.addSelectClause(ORDER_TABLE, ORDER_ID, ORDER_USER_ID, ORDER_CERTIFICATE_ID,
+                        ORDER_TOTAL, ORDER_PURCHASE_DATE)
+                .addWhereClause(ORDER_ID + " = ?");
 
         try {
-            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1), userId);
-            return count != null ? count : -1L;
+            return Optional.ofNullable(jdbcOperations.query(queryBuilder.build(), rs -> {
+                if (rs.next()) {
+                    return mapOrder(rs, 1);
+                }
+                return null;
+            }, id));
         } catch (DataAccessException e) {
-            throw new DaoException("Unable to get user order count (userId = " + userId + ")", e);
+            throw new DaoException("Unable to find order (id = " + id + ")", e);
         }
-    }
-
-    @Override
-    public Optional<Order> findById(int id) throws DaoException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

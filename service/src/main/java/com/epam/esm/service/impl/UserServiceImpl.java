@@ -1,10 +1,14 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.dao.UserDao;
+import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.UserService;
+import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.UserDto;
+import com.epam.esm.service.dto.mapper.impl.TagDtoMapper;
 import com.epam.esm.service.dto.mapper.impl.UserDtoMapper;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
@@ -22,12 +26,18 @@ public class UserServiceImpl implements UserService {
     public static final int USER_CODE = 3;
 
     private UserDao userDao;
+    private TagDao tagDao;
+
     private UserDtoMapper userMapper;
+    private TagDtoMapper tagMapper;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, UserDtoMapper userMapper) {
+    public UserServiceImpl(UserDao userDao, TagDao tagDao,
+                           UserDtoMapper userMapper, TagDtoMapper tagMapper) {
         this.userDao = userDao;
+        this.tagDao = tagDao;
         this.userMapper = userMapper;
+        this.tagMapper = tagMapper;
     }
 
     @Override
@@ -52,11 +62,6 @@ public class UserServiceImpl implements UserService {
         int pageNumber = Integer.parseInt(page);
         int pageSize = Integer.parseInt(size);
         try {
-            long count = userDao.getCount();
-            if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
-                throw new InvalidRequestDataException("Invalid pagination parameters", USER_CODE);
-            }
-
             List<User> users = userDao.getUsers(pageSize, pageNumber * pageSize);
             return userMapper.toDtoList(users);
 

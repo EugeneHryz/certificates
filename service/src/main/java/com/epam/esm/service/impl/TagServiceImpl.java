@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
@@ -22,11 +23,14 @@ public class TagServiceImpl implements TagService {
     public static final int TAG_CODE = 2;
 
     private TagDao tagDao;
+    private UserDao userDao;
+
     private TagDtoMapper tagMapper;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, TagDtoMapper mapper) {
+    public TagServiceImpl(TagDao tagDao, UserDao userDao, TagDtoMapper mapper) {
         this.tagDao = tagDao;
+        this.userDao = userDao;
         tagMapper = mapper;
     }
 
@@ -67,18 +71,7 @@ public class TagServiceImpl implements TagService {
         }
         int pageNumber = Integer.parseInt(page);
         int pageSize = Integer.parseInt(size);
-        long count;
-        try {
-            // count all tags
-            count = tagDao.getCount();
-        } catch (DaoException e) {
-            throw new ServiceException("Unable to count all tags", e, TAG_CODE);
-        }
 
-        // if page number is too big
-        if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
-            throw new InvalidRequestDataException("Invalid pagination parameters", TAG_CODE);
-        }
         try {
             List<Tag> tags = tagDao.getTags(pageSize, pageSize * pageNumber);
             return tagMapper.toDtoList(tags);
@@ -95,6 +88,24 @@ public class TagServiceImpl implements TagService {
             }
         } catch (DaoException e) {
             throw new ServiceException("Unable to delete tag (id = " + id + ")", e, TAG_CODE);
+        }
+    }
+
+    @Override
+    public TagDto getMostWidelyUsedTagOfUserWithHighestSpending() throws ServiceException, NoSuchElementException {
+        try {
+            int userWithHighestSpending = userDao.getUserIdWithHighestSpending();
+
+            int mostWidelyUsedTagId = userDao.findMostWidelyUsedUserTagId(userWithHighestSpending);
+            Optional<Tag> tag = tagDao.findById(mostWidelyUsedTagId);
+            if (!tag.isPresent()) {
+                throw new NoSuchElementException("Unable to find tag", TAG_CODE);
+            }
+            return tagMapper.toDto(tag.get());
+
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to get most widely used tag of a user " +
+                    "with highest spending", e, TAG_CODE);
         }
     }
 }

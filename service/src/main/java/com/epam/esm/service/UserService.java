@@ -12,4 +12,5 @@ public interface UserService {
     UserDto getUser(int id) throws ServiceException, NoSuchElementException;
 
     List<UserDto> getUsers(String page, String size) throws ServiceException, InvalidRequestDataException;
+
 }

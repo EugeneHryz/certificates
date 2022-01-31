@@ -13,7 +13,7 @@ public interface GiftCertificateService {
 
     GiftCertificateDto getCertificate(int id) throws NoSuchElementException, ServiceException;
 
-    List<GiftCertificateDto> getCertificates(String searchParam, String tagName, String sortBy,
+    List<GiftCertificateDto> getCertificates(String searchParam, String[] tags, String sortBy,
                                              String sortOrder, String page, String size) throws ServiceException, InvalidRequestDataException;
 
     void deleteCertificate(int id) throws ServiceException, NoSuchElementException;

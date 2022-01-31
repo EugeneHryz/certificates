@@ -87,6 +87,14 @@ public class TagController {
         tagService.deleteTag(id);
     }
 
+    @GetMapping(value = "/widelyUsedTag", produces = {"application/json"})
+    public TagRequestModel getMostWidelyUsedTagOfUserWithMostSpending()
+            throws ServiceException, NoSuchElementException {
+
+        TagDto tagDto = tagService.getMostWidelyUsedTagOfUserWithHighestSpending();
+        return tagMapper.toRequestModel(tagDto);
+    }
+
     private String extractValidationErrorMessage(BindingResult bindingResult) {
         Optional<String> message = bindingResult.getAllErrors().stream()
                 .map(error -> error.getDefaultMessage()).findFirst();

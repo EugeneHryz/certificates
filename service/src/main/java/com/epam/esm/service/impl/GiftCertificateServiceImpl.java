@@ -54,8 +54,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 throw new ServiceException("Certificate with name '" + gcDto.getName() + "' already exists", CERTIFICATE_CODE);
             }
             LocalDateTime currentDate = LocalDateTime.now();
-            if (gcDto.getCreated() != null && gcDto.getCreated().isAfter(currentDate)) {
-                throw new InvalidRequestDataException("'created' date cannot be in the future", CERTIFICATE_CODE);
+            if ((gcDto.getCreated() != null && gcDto.getCreated().isAfter(currentDate))
+                    || gcDto.getCreated() == null || gcDto.getLastUpdated() == null) {
+
+                throw new InvalidRequestDataException("Invalid date parameters specified", CERTIFICATE_CODE);
             }
             generatedId = certificateDao.create(certificateMapper.toEntity(gcDto));
             gcDto.setId(generatedId);
@@ -122,7 +124,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getCertificates(String searchParam, String tagName, String sortBy, String sortOrder,
+    public List<GiftCertificateDto> getCertificates(String searchParam, String[] tagNames, String sortBy, String sortOrder,
                                                     String page, String size) throws ServiceException, InvalidRequestDataException {
 
         QueryParamValidator validator = new QueryParamValidator();
@@ -130,17 +132,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 || !validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
             throw new InvalidRequestDataException("Invalid query parameters", CERTIFICATE_CODE);
         }
-        SearchParameter options = new SearchParameter(searchParam, tagName, sortBy, sortOrder);
+        SearchParameter options = new SearchParameter(searchParam, tagNames, sortBy, sortOrder);
         int pageNumber = Integer.parseInt(page);
         int pageSize = Integer.parseInt(size);
         List<GiftCertificate> certificates;
         try {
-            // get number of certificates with specified search options
-            long count = certificateDao.getCount(options);
-            // if page number is too big
-            if (!validator.validatePaginationParams(pageNumber, pageSize, count)) {
-                throw new InvalidRequestDataException("Invalid pagination parameters", CERTIFICATE_CODE);
-            }
             certificates = certificateDao.findCertificates(options, pageSize, pageNumber * pageSize);
         } catch (DaoException e) {
             throw new ServiceException("Unable to get certificates", e, CERTIFICATE_CODE);
@@ -241,26 +237,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     + certDto.getId(), e, CERTIFICATE_CODE);
         }
     }
-
-//    @Override
-//    public GiftCertificateDto updateCertificateDuration(GiftCertificateDurationOnlyDto certDurationDto) throws ServiceException, NoSuchElementException {
-//        try {
-//            Optional<GiftCertificate> existingCert = certificateDao.findById(certDurationDto.getId());
-//
-//            if (!existingCert.isPresent()) {
-//                throw new NoSuchElementException("Unable to update certificate (id = " + certDurationDto.getId() + ")");
-//            }
-//            existingCert.get().setDuration(certDurationDto.getDuration());
-//            Optional<GiftCertificate> updatedCert = certificateDao.update(existingCert.get());
-//            if (updatedCert.isPresent()) {
-//                return constructCertificateDto(updatedCert.get());
-//            } else {
-//                throw new ServiceException("Something went wrong while updating certificate duration");
-//            }
-//        } catch (DaoException e) {
-//            throw new ServiceException("Unable to update certificate duration", e);
-//        }
-//    }
 
     private GiftCertificateDto constructCertificateDto(GiftCertificate certificate) throws DaoException {
         List<Tag> updatedTags = tagDao.findTagsForCertificate(certificate);

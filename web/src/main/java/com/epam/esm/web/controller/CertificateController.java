@@ -77,13 +77,13 @@ public class CertificateController {
     @GetMapping(produces = {"application/json"})
     public List<GiftCertificateRequestModel> getCertificates(
             @RequestParam(value = "searchParam", defaultValue = "") String searchParam,
-            @RequestParam(value = "tag", defaultValue = "") String tag,
+            @RequestParam(value = "tags", defaultValue = "") String[] tags,
             @RequestParam(value = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder,
             @RequestParam(value = "page", defaultValue = "0") String page,
             @RequestParam(value = "size", defaultValue = "2") String size) throws ServiceException, InvalidRequestDataException {
 
-        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParam, tag, sortBy, sortOrder, page, size);
+        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParam, tags, sortBy, sortOrder, page, size);
         return certificateMapper.toRequestModelList(dtoList);
     }
 
@@ -123,20 +123,6 @@ public class CertificateController {
         GiftCertificateDto dto = certificateService.updateCertificate(certificateMapper.toDto(certRequestModel));
         return certificateMapper.toRequestModel(dto);
     }
-
-
-//    @PatchMapping("/{id}")
-//    public GiftCertificateDto updateCertificateDuration(@Valid @RequestBody GiftCertificateDurationOnlyDto certDurationDto,
-//                                                        BindingResult result, @PathVariable int id)
-//            throws InvalidRequestDataException, ServiceException, NoSuchElementException {
-//
-//        if (result.hasErrors()) {
-//            String errorMessage = extractValidationErrorMessage(result);
-//            throw new InvalidRequestDataException(errorMessage);
-//        }
-//        certDurationDto.setId(id);
-//        return certificateService.updateCertificateDuration(certDurationDto);
-//    }
 
     // fixme: duplicated code
     private String extractValidationErrorMessage(BindingResult bindingResult) {

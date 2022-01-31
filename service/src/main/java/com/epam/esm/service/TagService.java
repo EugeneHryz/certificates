@@ -16,4 +16,6 @@ public interface TagService {
     List<TagDto> getTags(String page, String size) throws ServiceException, InvalidRequestDataException;
 
     void deleteTag(int id) throws NoSuchElementException, ServiceException;
+
+    TagDto getMostWidelyUsedTagOfUserWithHighestSpending() throws ServiceException, NoSuchElementException;
 }

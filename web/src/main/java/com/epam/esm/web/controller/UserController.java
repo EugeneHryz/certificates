@@ -4,12 +4,14 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.dto.OrderDto;
 import com.epam.esm.service.dto.UserDto;
+import com.epam.esm.service.impl.OrderServiceImpl;
 import com.epam.esm.web.model.mapper.impl.OrderModelMapper;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.web.model.OrderRequestModel;
 import com.epam.esm.web.model.UserRequestModel;
+import com.epam.esm.web.model.mapper.impl.TagModelMapper;
 import com.epam.esm.web.model.mapper.impl.UserModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -27,6 +29,7 @@ public class UserController {
 
     private UserModelMapper userMapper;
     private OrderModelMapper orderMapper;
+    private TagModelMapper tagMapper;
 
     @Autowired
     public UserController(UserService userService, OrderService orderService,
@@ -51,17 +54,19 @@ public class UserController {
         return userMapper.toRequestModelList(usersDto);
     }
 
-//    @PostMapping(value = "/{userId}/orders", consumes = {"application/json"})
-//    public OrderDto purchaseCertificate(@RequestBody OrderCertificateIdOnlyDto orderCertIdDto,
-//                                        @PathVariable int userId, BindingResult bindingResult)
-//            throws ServiceException, NoSuchElementException, InvalidRequestDataException {
-//
-//        if (bindingResult.hasErrors()) {
-//            throw new InvalidRequestDataException(extractValidationErrorMessage(bindingResult));
-//        }
-//        orderCertIdDto.setUserId(userId);
-//        return orderService.placeOrder(orderCertIdDto);
-//    }
+    @PostMapping(value = "/{userId}/orders", consumes = {"application/json"})
+    public OrderRequestModel purchaseCertificate(@RequestBody OrderRequestModel orderRequestModel,
+                                        @PathVariable int userId, BindingResult bindingResult)
+            throws ServiceException, NoSuchElementException, InvalidRequestDataException {
+
+        if (bindingResult.hasErrors()) {
+            throw new InvalidRequestDataException(extractValidationErrorMessage(bindingResult),
+                    OrderServiceImpl.ORDER_CODE);
+        }
+        orderRequestModel.setUserId(userId);
+        OrderDto createdOrder = orderService.placeOrder(orderMapper.toDto(orderRequestModel));
+        return orderMapper.toRequestModel(createdOrder);
+    }
 
     @GetMapping(value = "/{userId}/orders", produces = {"application/json"})
     public List<OrderRequestModel> getUserOrders(@RequestParam(value = "page", defaultValue = "0") String page,
@@ -71,6 +76,14 @@ public class UserController {
 
         List<OrderDto> ordersDto = orderService.getUserOrders(userId, page, size);
         return orderMapper.toRequestModelList(ordersDto);
+    }
+
+    @GetMapping(value = "/{userId}/orders/{orderId}", produces = {"application/json"})
+    public OrderRequestModel getUserOrder(@PathVariable int userId, @PathVariable int orderId)
+            throws ServiceException, NoSuchElementException {
+
+        OrderDto orderDto = orderService.getUserOrder(userId, orderId);
+        return orderMapper.toRequestModel(orderDto);
     }
 
     private String extractValidationErrorMessage(BindingResult bindingResult) {

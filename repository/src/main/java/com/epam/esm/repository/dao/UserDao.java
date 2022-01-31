@@ -8,4 +8,9 @@ import java.util.List;
 public interface UserDao extends BaseDao<User> {
 
     List<User> getUsers(int limit, int offset) throws DaoException;
+
+
+    int getUserIdWithHighestSpending() throws DaoException;
+
+    int findMostWidelyUsedUserTagId(int userId) throws DaoException;
 }

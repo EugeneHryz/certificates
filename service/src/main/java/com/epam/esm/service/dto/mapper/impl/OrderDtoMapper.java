@@ -10,7 +10,7 @@ public class OrderDtoMapper implements DtoMapper<Order, OrderDto> {
 
     @Override
     public Order toEntity(OrderDto dto) {
-        Order order = new Order(dto.getUserId(), dto.getCertificateId(), dto.getTotal(), dto.getDate());
+        Order order = new Order(dto.getUserId(), dto.getCertificateId(), dto.getTotal(), dto.getPurchaseDate());
         order.setId(dto.getId());
         return order;
     }

@@ -3,14 +3,14 @@ package com.epam.esm.repository.searchoption;
 public class SearchParameter {
 
     private String searchParam;
-    private String tagName;
+    private String[] tagNames;
 
     private String sortBy;
     private String sortOrder;
 
-    public SearchParameter(String searchParam, String tagName, String sortBy, String sortOrder) {
+    public SearchParameter(String searchParam, String[] tagNames, String sortBy, String sortOrder) {
         this.searchParam = searchParam;
-        this.tagName = tagName;
+        this.tagNames = tagNames;
         this.sortBy = sortBy;
         this.sortOrder = sortOrder;
     }
@@ -23,12 +23,12 @@ public class SearchParameter {
         this.searchParam = searchParam;
     }
 
-    public String getTagName() {
-        return tagName;
+    public String[] getTagNames() {
+        return tagNames;
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setTagNames(String[] tagNames) {
+        this.tagNames = tagNames;
     }
 
     public String getSortBy() {

@@ -11,6 +11,7 @@ public class SqlQueryBuilder {
     private static final String WHERE_STATEMENT = "WHERE";
     private static final String UPDATE_STATEMENT = "UPDATE";
     private static final String ORDER_BY_STATEMENT = "ORDER BY";
+    private static final String GROUP_BY_STATEMENT = "GROUP BY";
     private static final String INNER_JOIN_STATEMENT = "INNER JOIN";
     private static final String LIMIT_STATEMENT = "LIMIT";
     private static final String OFFSET_STATEMENT = "OFFSET";
@@ -66,17 +67,6 @@ public class SqlQueryBuilder {
         return this;
     }
 
-    public SqlQueryBuilder addSelectCount(String tableName) {
-        queryBuilder.append(SELECT_STATEMENT)
-                .append(" ")
-                .append(COUNT_FUNCTION)
-                .append("(*) ")
-                .append("FROM ")
-                .append(tableName);
-
-        return this;
-    }
-
     public SqlQueryBuilder addOrderByClause(String columnName, String sortOrder) {
         queryBuilder.append(" ")
                 .append(ORDER_BY_STATEMENT)
@@ -86,6 +76,15 @@ public class SqlQueryBuilder {
         if (sortOrder.equals("desc")) {
             queryBuilder.append(" DESC");
         }
+        return this;
+    }
+
+    public SqlQueryBuilder addGroupByClause(String columnName) {
+        queryBuilder.append(" ")
+                .append(GROUP_BY_STATEMENT)
+                .append(" ")
+                .append(columnName);
+
         return this;
     }
 

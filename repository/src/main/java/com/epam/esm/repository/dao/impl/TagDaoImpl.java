@@ -130,19 +130,6 @@ public class TagDaoImpl implements TagDao {
         }
     }
 
-    @Override
-    public long getCount() throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectCount(TAG_TABLE);
-
-        try {
-            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
-            return count != null ? count : -1L;
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to get tag count", e);
-        }
-    }
-
     private Tag mapTag(ResultSet resultSet, int rowNum) throws SQLException {
         Tag tag = new Tag(resultSet.getString(TAG_NAME));
         tag.setId(resultSet.getInt(TAG_ID));
