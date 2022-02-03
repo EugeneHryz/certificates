@@ -69,13 +69,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getUserOrders(int userId, String page, String size) throws ServiceException, NoSuchElementException, InvalidRequestDataException {
-        QueryParamValidator validator = new QueryParamValidator();
-        if (!validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid pagination parameters", ORDER_CODE);
-        }
-        int pageNumber = Integer.parseInt(page);
-        int pageSize = Integer.parseInt(size);
+    public List<OrderDto> getUserOrders(int userId, int pageNumber, int pageSize) throws ServiceException {
         try {
             List<Order> userOrders = orderDao.getUserOrders(userId, pageSize, pageNumber * pageSize);
             return orderMapper.toDtoList(userOrders);
@@ -97,6 +91,20 @@ public class OrderServiceImpl implements OrderService {
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to find order (orderId = " + orderId + ")", e, ORDER_CODE);
+        }
+    }
+
+    @Override
+    public long getUserOrderCount(int userId) throws ServiceException, NoSuchElementException {
+        try {
+            Optional<User> user = userDao.findById(userId);
+            if (!user.isPresent()) {
+                throw new NoSuchElementException("Unable to find user (useId = " + userId + ")", ORDER_CODE);
+            }
+            return orderDao.getUserOrderCount(userId);
+
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to count all user orders", e, ORDER_CODE);
         }
     }
 }

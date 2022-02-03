@@ -120,6 +120,19 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public long getCount() throws DaoException {
+        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
+        queryBuilder.addSelectClause(USER_TABLE, "COUNT(*)");
+
+        try {
+            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
+            return count != null ? count : -1L;
+        } catch (DataAccessException e) {
+            throw new DaoException("Unable to get user count", e);
+        }
+    }
+
+    @Override
     public Optional<User> update(User entity) throws DaoException {
         throw new UnsupportedOperationException();
     }

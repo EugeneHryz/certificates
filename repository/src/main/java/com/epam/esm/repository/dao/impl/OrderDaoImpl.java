@@ -82,6 +82,21 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
+    public long getUserOrderCount(int userId) throws DaoException {
+        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
+        queryBuilder.addSelectClause(ORDER_TABLE, "COUNT(*)")
+                .addWhereClause(ORDER_USER_ID + " = ?");
+
+        try {
+            Long count = jdbcOperations.queryForObject(queryBuilder.build(),
+                    (rs, rowNum) -> rs.getLong(1), userId);
+            return count != null ? count : -1L;
+        } catch (DataAccessException e) {
+            throw new DaoException("Unable to get user order count (userId = " + userId + ")", e);
+        }
+    }
+
+    @Override
     public boolean deleteById(int id) throws DaoException {
         throw new UnsupportedOperationException();
     }

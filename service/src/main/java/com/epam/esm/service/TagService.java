@@ -5,6 +5,7 @@ import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 
+import javax.xml.ws.Service;
 import java.util.List;
 
 public interface TagService {
@@ -13,9 +14,11 @@ public interface TagService {
 
     TagDto getTag(int id) throws NoSuchElementException, ServiceException;
 
-    List<TagDto> getTags(String page, String size) throws ServiceException, InvalidRequestDataException;
+    List<TagDto> getTags(int page, int size) throws ServiceException;
 
     void deleteTag(int id) throws NoSuchElementException, ServiceException;
 
     TagDto getMostWidelyUsedTagOfUserWithHighestSpending() throws ServiceException, NoSuchElementException;
+
+    long getTagCount() throws ServiceException;
 }

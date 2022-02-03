@@ -2,11 +2,9 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.dao.UserDao;
-import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.service.dto.mapper.impl.TagDtoMapper;
 import com.epam.esm.service.dto.mapper.impl.UserDtoMapper;
@@ -54,19 +52,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsers(String page, String size) throws ServiceException, InvalidRequestDataException {
-        QueryParamValidator validator = new QueryParamValidator();
-        if (!validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid pagination parameters", USER_CODE);
-        }
-        int pageNumber = Integer.parseInt(page);
-        int pageSize = Integer.parseInt(size);
+    public List<UserDto> getUsers(int pageNumber, int pageSize) throws ServiceException {
         try {
             List<User> users = userDao.getUsers(pageSize, pageNumber * pageSize);
             return userMapper.toDtoList(users);
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get users", e, USER_CODE);
+        }
+    }
+
+    @Override
+    public long getUserCount() throws ServiceException {
+        try {
+            return userDao.getCount();
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to count all users", e, USER_CODE);
         }
     }
 }

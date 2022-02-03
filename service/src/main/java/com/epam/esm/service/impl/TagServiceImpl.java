@@ -64,14 +64,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> getTags(String page, String size) throws ServiceException, InvalidRequestDataException {
-        QueryParamValidator validator = new QueryParamValidator();
-        if (!validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid pagination parameters", TAG_CODE);
-        }
-        int pageNumber = Integer.parseInt(page);
-        int pageSize = Integer.parseInt(size);
-
+    public List<TagDto> getTags(int pageNumber, int pageSize) throws ServiceException {
         try {
             List<Tag> tags = tagDao.getTags(pageSize, pageSize * pageNumber);
             return tagMapper.toDtoList(tags);
@@ -106,6 +99,15 @@ public class TagServiceImpl implements TagService {
         } catch (DaoException e) {
             throw new ServiceException("Unable to get most widely used tag of a user " +
                     "with highest spending", e, TAG_CODE);
+        }
+    }
+
+    @Override
+    public long getTagCount() throws ServiceException {
+        try {
+            return tagDao.getCount();
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to count all tags", e, TAG_CODE);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.epam.esm.web.model;
 
 import com.epam.esm.service.validator.DateValidity;
 import com.epam.esm.service.validator.FieldValidity;
+import org.springframework.hateoas.PagedModel;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

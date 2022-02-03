@@ -23,12 +23,6 @@ public class RestExceptionHandler {
             status = HttpStatus.BAD_REQUEST;
         }
 
-//        ResponseStatus statusAnnotation = AnnotationUtils.getAnnotation(e.getClass(), ResponseStatus.class);
-//        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-//        if (statusAnnotation != null) {
-//            status = statusAnnotation.value();
-//        }
-
         return new ResponseEntity<>(new Error(
                 status.value() * 100 + ((ResourceCodeAccess)e).getResourceCode(), e.getMessage()), status);
     }

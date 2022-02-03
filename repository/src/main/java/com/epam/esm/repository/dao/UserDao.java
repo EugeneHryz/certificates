@@ -9,6 +9,8 @@ public interface UserDao extends BaseDao<User> {
 
     List<User> getUsers(int limit, int offset) throws DaoException;
 
+    long getCount() throws DaoException;
+
 
     int getUserIdWithHighestSpending() throws DaoException;
 

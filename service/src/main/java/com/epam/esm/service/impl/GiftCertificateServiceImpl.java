@@ -124,17 +124,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getCertificates(String searchParam, String[] tagNames, String sortBy, String sortOrder,
-                                                    String page, String size) throws ServiceException, InvalidRequestDataException {
-
-        QueryParamValidator validator = new QueryParamValidator();
-        if (!validator.validateSortType(sortBy) || !validator.validateSortOrder(sortOrder)
-                || !validator.validatePositiveInteger(page) || !validator.validatePositiveInteger(size)) {
-            throw new InvalidRequestDataException("Invalid query parameters", CERTIFICATE_CODE);
-        }
-        SearchParameter options = new SearchParameter(searchParam, tagNames, sortBy, sortOrder);
-        int pageNumber = Integer.parseInt(page);
-        int pageSize = Integer.parseInt(size);
+    public List<GiftCertificateDto> getCertificates(SearchParameter options, int pageNumber, int pageSize) throws ServiceException {
         List<GiftCertificate> certificates;
         try {
             certificates = certificateDao.findCertificates(options, pageSize, pageNumber * pageSize);
@@ -235,6 +225,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         } catch (DaoException e) {
             throw new ServiceException("Error while updating certificate with id = "
                     + certDto.getId(), e, CERTIFICATE_CODE);
+        }
+    }
+
+    @Override
+    public long getCertificateCount(SearchParameter options) throws ServiceException {
+        try {
+            return certificateDao.getCount(options);
+        } catch (DaoException e) {
+            throw new ServiceException("Unable to count certificates", e, CERTIFICATE_CODE);
         }
     }
 

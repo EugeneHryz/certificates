@@ -1,35 +1,50 @@
 package com.epam.esm.web.controller;
 
+import com.epam.esm.repository.searchoption.SearchParameter;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
-import com.epam.esm.web.model.mapper.impl.GiftCertificateModelMapper;
+import com.epam.esm.web.model.hateoas.CertificateModelAssembler;
+import com.epam.esm.web.model.hateoas.pagination.impl.PagedCertificateModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/certificates")
 public class CertificateController {
 
     private GiftCertificateService certificateService;
+    private CertificateModelAssembler certificateAssembler;
+    private PagedCertificateModelAssembler pagedCertificateAssembler;
 
-    private GiftCertificateModelMapper certificateMapper;
+    private ConversionService conversionService;
 
     @Autowired
     public CertificateController(GiftCertificateService certService,
-                                 GiftCertificateModelMapper certificateMapper) {
+                                 CertificateModelAssembler certificateAssembler,
+                                 PagedCertificateModelAssembler pagedAssembler,
+                                 ConversionService service) {
         this.certificateService = certService;
-        this.certificateMapper = certificateMapper;
+        this.certificateAssembler = certificateAssembler;
+        this.pagedCertificateAssembler = pagedAssembler;
+        conversionService = service;
     }
 
     /**
@@ -40,15 +55,24 @@ public class CertificateController {
      * @throws ServiceException if an error occurs
      */
     @PostMapping(consumes = "application/json")
-    @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificateRequestModel createGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel gcRequestModel,
-                                                    BindingResult result) throws ServiceException, InvalidRequestDataException {
+    public ResponseEntity<?> createGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel gcRequestModel,
+                                                BindingResult result) throws ServiceException, InvalidRequestDataException {
         if (result.hasErrors()) {
             String errorMessage = extractValidationErrorMessage(result);
             throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
-        GiftCertificateDto gcDto = certificateMapper.toDto(gcRequestModel);
-        return certificateMapper.toRequestModel(certificateService.createCertificate(gcDto));
+
+        GiftCertificateDto gcDto = conversionService.convert(gcRequestModel, GiftCertificateDto.class);
+        List<TagDto> tagsDto = gcRequestModel.getTags().stream()
+                .map(c -> conversionService.convert(c, TagDto.class)).collect(Collectors.toList());
+        gcDto.setTags(tagsDto);
+
+        GiftCertificateRequestModel certificateModel = conversionService.convert(
+                certificateService.createCertificate(gcDto), GiftCertificateRequestModel.class);
+
+        EntityModel<GiftCertificateRequestModel> entityModel = certificateAssembler.toModel(certificateModel);
+        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
     }
 
     /**
@@ -60,31 +84,43 @@ public class CertificateController {
      * @throws ServiceException if an error occurs
      */
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    public GiftCertificateRequestModel getGiftCertificate(@PathVariable int id) throws NoSuchElementException, ServiceException {
-        return certificateMapper.toRequestModel(certificateService.getCertificate(id));
+    public EntityModel<GiftCertificateRequestModel> getGiftCertificate(@PathVariable int id)
+            throws NoSuchElementException, ServiceException {
+
+        GiftCertificateRequestModel certificateModel = conversionService
+                .convert(certificateService.getCertificate(id), GiftCertificateRequestModel.class);
+        return certificateAssembler.toModel(certificateModel);
     }
 
-//    /**
-//     * get filtered and sorted list of GiftCertificateDto
-//     *
-//     * @param searchParam search certificates by part of name or description
-//     * @param tag search certificates by one tag name associated with them
-//     * @param sortBy specifies how certificates will be sorted (date - by last update date, name - by name)
-//     * @param sortOrder specifies sort order (asc - ascending, desc - descending)
-//     * @return list of GiftCertificateDto
-//     * @throws ServiceException if an error occurs
-//     */
+    /**
+     * get filtered and sorted list of GiftCertificateDto
+     *
+     * @param searchParam search certificates by part of name or description
+     * @param tag search certificates by one tag name associated with them
+     * @param sortBy specifies how certificates will be sorted (date - by last update date, name - by name)
+     * @param sortOrder specifies sort order (asc - ascending, desc - descending)
+     * @return list of GiftCertificateDto
+     * @throws ServiceException if an error occurs
+     */
     @GetMapping(produces = {"application/json"})
-    public List<GiftCertificateRequestModel> getCertificates(
+    public PagedModel<EntityModel<GiftCertificateRequestModel>> getCertificates(
             @RequestParam(value = "searchParam", defaultValue = "") String searchParam,
             @RequestParam(value = "tags", defaultValue = "") String[] tags,
             @RequestParam(value = "sortBy", defaultValue = "date") String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = "asc") String sortOrder,
-            @RequestParam(value = "page", defaultValue = "0") String page,
-            @RequestParam(value = "size", defaultValue = "2") String size) throws ServiceException, InvalidRequestDataException {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "2") int size) throws ServiceException, InvalidRequestDataException {
 
-        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParam, tags, sortBy, sortOrder, page, size);
-        return certificateMapper.toRequestModelList(dtoList);
+        // todo: validate this???
+        SearchParameter searchParameter = new SearchParameter(searchParam, tags, sortBy, sortOrder);
+
+        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParameter, page, size);
+        List<GiftCertificateRequestModel> requestModelList = dtoList.stream()
+                .map(r -> conversionService.convert(r, GiftCertificateRequestModel.class)).collect(Collectors.toList());
+
+        long totalCount = certificateService.getCertificateCount(searchParameter);
+        PagedModel.PageMetadata pageMetadata = pagedCertificateAssembler.constructPageMetadata(totalCount, page, size);
+        return pagedCertificateAssembler.toPagedModel(requestModelList, pageMetadata, searchParameter);
     }
 
     /**
@@ -111,7 +147,7 @@ public class CertificateController {
      * @throws NoSuchElementException if there's no such certificate with specified id
      */
     @PutMapping("/{id}")
-    public GiftCertificateRequestModel updateGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel certRequestModel,
+    public EntityModel<GiftCertificateRequestModel> updateGiftCertificate(@Valid @RequestBody GiftCertificateRequestModel certRequestModel,
                                                     BindingResult result, @PathVariable int id)
             throws ServiceException, NoSuchElementException, InvalidRequestDataException {
 
@@ -120,8 +156,11 @@ public class CertificateController {
             throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
         certRequestModel.setId(id);
-        GiftCertificateDto dto = certificateService.updateCertificate(certificateMapper.toDto(certRequestModel));
-        return certificateMapper.toRequestModel(dto);
+        GiftCertificateDto certDto = conversionService.convert(certRequestModel, GiftCertificateDto.class);
+        GiftCertificateDto updatedDto = certificateService.updateCertificate(certDto);
+        GiftCertificateRequestModel certModel = conversionService.convert(updatedDto, GiftCertificateRequestModel.class);
+
+        return certificateAssembler.toModel(certModel);
     }
 
     // fixme: duplicated code

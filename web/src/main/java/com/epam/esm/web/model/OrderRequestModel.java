@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class OrderRequestModel {
 
+    // todo: validate these fields
     private int id;
     private int userId;
     private int certificateId;

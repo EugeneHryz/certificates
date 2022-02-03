@@ -10,4 +10,5 @@ public interface OrderDao extends BaseDao<Order> {
 
     List<Order> getUserOrders(int userId, int limit, int offset) throws DaoException;
 
+    long getUserOrderCount(int userId) throws DaoException;
 }

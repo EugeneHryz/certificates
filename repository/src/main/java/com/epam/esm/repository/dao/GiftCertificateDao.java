@@ -15,4 +15,5 @@ public interface GiftCertificateDao extends BaseDao<GiftCertificate> {
 
     Optional<GiftCertificate> findByName(String name) throws DaoException;
 
+    long getCount(SearchParameter options) throws DaoException;
 }
