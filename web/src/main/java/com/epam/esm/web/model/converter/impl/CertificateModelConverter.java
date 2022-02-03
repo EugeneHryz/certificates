@@ -4,41 +4,17 @@ import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.TagRequestModel;
-import com.epam.esm.web.model.converter.AbstractTwoWayConverter;
+import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCertificateDto, GiftCertificateRequestModel> {
+public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCertificateRequestModel, GiftCertificateDto> {
 
     @Override
-    protected GiftCertificateRequestModel convertTo(GiftCertificateDto source) {
-        GiftCertificateRequestModel certModel = new GiftCertificateRequestModel();
-        try {
-            BeanUtils.copyProperties(certModel, source);
-
-            List<TagRequestModel> tagsModel = source.getTags().stream().map(t -> {
-                TagRequestModel tagModel = new TagRequestModel();
-                try {
-                    BeanUtils.copyProperties(tagModel, t);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    // ignore :(
-                    e.printStackTrace();
-                }
-                return tagModel;
-            }).collect(Collectors.toList());
-            certModel.setTags(tagsModel);
-
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return certModel;
-    }
-
-    @Override
-    protected GiftCertificateDto convertBack(GiftCertificateRequestModel source) {
+    protected GiftCertificateDto convertTo(GiftCertificateRequestModel source) {
         GiftCertificateDto certDto = new GiftCertificateDto();
         try {
             BeanUtils.copyProperties(certDto, source);
@@ -48,6 +24,7 @@ public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCerti
                 try {
                     BeanUtils.copyProperties(tagDto, t);
                 } catch (IllegalAccessException | InvocationTargetException e) {
+                    // ignore ?
                     e.printStackTrace();
                 }
                 return tagDto;
@@ -58,5 +35,28 @@ public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCerti
             e.printStackTrace();
         }
         return certDto;
+    }
+
+    @Override
+    protected GiftCertificateRequestModel convertBack(GiftCertificateDto source) {
+        GiftCertificateRequestModel certModel = new GiftCertificateRequestModel();
+        try {
+            BeanUtils.copyProperties(certModel, source);
+
+            List<TagRequestModel> tagsModel = source.getTags().stream().map(t -> {
+                TagRequestModel tagModel = new TagRequestModel();
+                try {
+                    BeanUtils.copyProperties(tagModel, t);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                return tagModel;
+            }).collect(Collectors.toList());
+            certModel.setTags(tagsModel);
+
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return certModel;
     }
 }

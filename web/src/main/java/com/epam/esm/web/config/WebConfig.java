@@ -1,5 +1,9 @@
 package com.epam.esm.web.config;
 
+import com.epam.esm.service.dto.converter.impl.CertificateDtoConverter;
+import com.epam.esm.service.dto.converter.impl.OrderDtoConverter;
+import com.epam.esm.service.dto.converter.impl.TagDtoConverter;
+import com.epam.esm.service.dto.converter.impl.UserDtoConverter;
 import com.epam.esm.web.model.converter.impl.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,7 +23,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan({"com.epam.esm.web", "com.epam.esm.service"})
+@ComponentScan({"com.epam.esm.web"})
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
@@ -38,5 +42,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new UserModelConverter());
         registry.addConverter(new OrderModelConverter());
         registry.addConverter(new CertificateModelConverter());
+
+        registry.addConverter(new TagDtoConverter());
+        registry.addConverter(new UserDtoConverter());
+        registry.addConverter(new OrderDtoConverter());
+        registry.addConverter(new CertificateDtoConverter());
     }
 }

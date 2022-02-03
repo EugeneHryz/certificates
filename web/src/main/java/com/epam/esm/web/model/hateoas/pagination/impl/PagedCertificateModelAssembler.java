@@ -1,6 +1,6 @@
 package com.epam.esm.web.model.hateoas.pagination.impl;
 
-import com.epam.esm.repository.searchoption.SearchParameter;
+import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.web.controller.CertificateController;
@@ -31,7 +31,7 @@ public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftC
 
     public PagedModel<EntityModel<GiftCertificateRequestModel>> toPagedModel(List<GiftCertificateRequestModel> page,
                                                                              PagedModel.PageMetadata pageMetadata,
-                                                                             SearchParameter options) {
+                                                                             CertificateSearchParameter options) {
         PagedModel<EntityModel<GiftCertificateRequestModel>> pagedModel = toPagedModel(page, pageMetadata);
         try {
             List<Link> links = createLinks(pageMetadata, options);
@@ -52,7 +52,7 @@ public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftC
         return PagedModel.of(collectionModel, pageMetadata);
     }
 
-    private List<Link> createLinks(PagedModel.PageMetadata pageMetadata, SearchParameter options) throws ServiceException, InvalidRequestDataException {
+    private List<Link> createLinks(PagedModel.PageMetadata pageMetadata, CertificateSearchParameter options) throws ServiceException, InvalidRequestDataException {
         int currentPage = (int)pageMetadata.getNumber();
         int pageSize = (int)pageMetadata.getSize();
         int totalPages = (int)pageMetadata.getTotalPages();

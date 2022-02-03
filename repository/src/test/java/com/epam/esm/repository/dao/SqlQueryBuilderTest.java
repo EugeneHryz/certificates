@@ -1,13 +1,13 @@
 package com.epam.esm.repository.dao;
 
-import com.epam.esm.repository.dao.query.DatabaseColumn;
+import com.epam.esm.repository.dao.query.DatabaseName;
 import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
-import static com.epam.esm.repository.dao.query.DatabaseColumn.CERTIFICATE_DURATION;
+import static com.epam.esm.repository.dao.query.DatabaseName.*;
+import static com.epam.esm.repository.dao.query.DatabaseName.CERTIFICATE_DURATION;
 
 public class SqlQueryBuilderTest {
 
@@ -44,7 +44,7 @@ public class SqlQueryBuilderTest {
     public void selectCertificateByIdShouldBeCorrect() {
         queryBuilder.addSelectClause(CERTIFICATE_TABLE, CERTIFICATE_ID, CERTIFICATE_NAME, CERTIFICATE_DESCRIPTION,
                 CERTIFICATE_PRICE, CERTIFICATE_DURATION, CERTIFICATE_CREATE_DATE, CERTIFICATE_LAST_UPDATE_DATE);
-        queryBuilder.addWhereClause(DatabaseColumn.CERTIFICATE_ID + " = ?");
+        queryBuilder.addWhereClause(DatabaseName.CERTIFICATE_ID + " = ?");
 
         String expected = "SELECT id, name, description, price, duration, create_date, " +
                 "last_update_date FROM gift_certificate WHERE id = ?";

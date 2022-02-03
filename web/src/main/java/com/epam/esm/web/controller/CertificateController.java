@@ -1,6 +1,6 @@
 package com.epam.esm.web.controller;
 
-import com.epam.esm.repository.searchoption.SearchParameter;
+import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
@@ -112,7 +112,7 @@ public class CertificateController {
             @RequestParam(value = "size", defaultValue = "2") int size) throws ServiceException, InvalidRequestDataException {
 
         // todo: validate this???
-        SearchParameter searchParameter = new SearchParameter(searchParam, tags, sortBy, sortOrder);
+        CertificateSearchParameter searchParameter = new CertificateSearchParameter(searchParam, tags, sortBy, sortOrder);
 
         List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParameter, page, size);
         List<GiftCertificateRequestModel> requestModelList = dtoList.stream()

@@ -6,17 +6,15 @@ import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.dto.UserDto;
-import com.epam.esm.service.dto.mapper.impl.TagDtoMapper;
-import com.epam.esm.service.dto.mapper.impl.UserDtoMapper;
-import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
-import com.epam.esm.service.validator.QueryParamValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -26,16 +24,13 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     private TagDao tagDao;
 
-    private UserDtoMapper userMapper;
-    private TagDtoMapper tagMapper;
+    private ConversionService conversionService;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, TagDao tagDao,
-                           UserDtoMapper userMapper, TagDtoMapper tagMapper) {
+    public UserServiceImpl(UserDao userDao, TagDao tagDao, ConversionService conversionService) {
         this.userDao = userDao;
         this.tagDao = tagDao;
-        this.userMapper = userMapper;
-        this.tagMapper = tagMapper;
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -45,7 +40,7 @@ public class UserServiceImpl implements UserService {
             if (!user.isPresent()) {
                 throw new NoSuchElementException("Unable to get user (id = " + id + ")", USER_CODE);
             }
-            return userMapper.toDto(user.get());
+            return conversionService.convert(user, UserDto.class);
         } catch (DaoException e) {
             throw new ServiceException("Unable to get user (id = " + id + ")", e, USER_CODE);
         }
@@ -55,7 +50,8 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers(int pageNumber, int pageSize) throws ServiceException {
         try {
             List<User> users = userDao.getUsers(pageSize, pageNumber * pageSize);
-            return userMapper.toDtoList(users);
+            return users.stream().map(u -> conversionService.convert(u, UserDto.class))
+                    .collect(Collectors.toList());
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get users", e, USER_CODE);

@@ -9,18 +9,17 @@ import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.dto.OrderDto;
-import com.epam.esm.service.dto.mapper.impl.OrderDtoMapper;
-import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
-import com.epam.esm.service.validator.QueryParamValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderServiceImpl implements OrderService {
@@ -30,15 +29,16 @@ public class OrderServiceImpl implements OrderService {
     private OrderDao orderDao;
     private UserDao userDao;
     private GiftCertificateDao certificateDao;
-    private OrderDtoMapper orderMapper;
+
+    private ConversionService conversionService;
 
     @Autowired
-    public OrderServiceImpl(OrderDao orderDao, UserDao userDao,
-                            GiftCertificateDao certificateDao, OrderDtoMapper orderMapper) {
+    public OrderServiceImpl(OrderDao orderDao, UserDao userDao, GiftCertificateDao certificateDao,
+                            ConversionService conversionService) {
         this.orderDao = orderDao;
         this.userDao = userDao;
         this.certificateDao = certificateDao;
-        this.orderMapper = orderMapper;
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             int generatedId = orderDao.create(order);
             order.setId(generatedId);
-            return orderMapper.toDto(order);
+            return conversionService.convert(order, OrderDto.class);
         } catch (DaoException e) {
             throw new ServiceException("Unable to create order", e, ORDER_CODE);
         }
@@ -72,7 +72,8 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getUserOrders(int userId, int pageNumber, int pageSize) throws ServiceException {
         try {
             List<Order> userOrders = orderDao.getUserOrders(userId, pageSize, pageNumber * pageSize);
-            return orderMapper.toDtoList(userOrders);
+            return userOrders.stream().map(u -> conversionService.convert(u, OrderDto.class))
+                    .collect(Collectors.toList());
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get user orders", e, ORDER_CODE);
@@ -87,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new NoSuchElementException("Cannot find order (orderId = " + orderId +
                         ") for a user (userId = " + userId + ")", ORDER_CODE);
             }
-            return orderMapper.toDto(order.get());
+            return conversionService.convert(order, OrderDto.class);
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to find order (orderId = " + orderId + ")", e, ORDER_CODE);

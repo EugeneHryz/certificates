@@ -1,8 +1,8 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.searchoption.SearchParameter;
+import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
-import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseName.*;
 
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.dao.query.SqlQueryBuilder;
@@ -10,13 +10,11 @@ import com.epam.esm.repository.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -95,7 +93,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findCertificates(SearchParameter options, int limit, int offset) throws DaoException {
+    public List<GiftCertificate> findCertificates(CertificateSearchParameter options, int limit, int offset) throws DaoException {
         SqlQueryBuilder queryBuilder = constructGetCertificatesQueryBuilder(options);
 
         String sortColumn = options.getSortBy().equals("date") ? CERTIFICATE_LAST_UPDATE_DATE : CERTIFICATE_NAME;
@@ -158,7 +156,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public long getCount(SearchParameter options) throws DaoException {
+    public long getCount(CertificateSearchParameter options) throws DaoException {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
 
         String where = "";
@@ -196,7 +194,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }
     }
 
-    private SqlQueryBuilder constructGetCertificatesQueryBuilder(SearchParameter options) {
+    private SqlQueryBuilder constructGetCertificatesQueryBuilder(CertificateSearchParameter options) {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
 
         String where = "";

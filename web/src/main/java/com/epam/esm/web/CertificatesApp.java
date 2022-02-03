@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {"com.epam.esm.repository.config",
-        "com.epam.esm.web", "com.epam.esm.service"})
+        "com.epam.esm.web.config", "com.epam.esm.service.config"})
 public class CertificatesApp {
 
     public static void main(String[] args) {

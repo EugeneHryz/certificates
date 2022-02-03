@@ -1,6 +1,6 @@
 package com.epam.esm.repository.dao.query;
 
-public final class DatabaseColumn {
+public final class DatabaseName {
 
     // Gift certificate table
     public static final String CERTIFICATE_TABLE = "gift_certificate";
@@ -36,6 +36,6 @@ public final class DatabaseColumn {
     public static final String ORDER_TOTAL = "total";
     public static final String ORDER_PURCHASE_DATE = "purchase_date";
 
-    private DatabaseColumn() {
+    private DatabaseName() {
     }
 }

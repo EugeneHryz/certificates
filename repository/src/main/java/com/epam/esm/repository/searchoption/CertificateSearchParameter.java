@@ -1,6 +1,6 @@
 package com.epam.esm.repository.searchoption;
 
-public class SearchParameter {
+public class CertificateSearchParameter {
 
     private String searchParam;
     private String[] tagNames;
@@ -8,7 +8,7 @@ public class SearchParameter {
     private String sortBy;
     private String sortOrder;
 
-    public SearchParameter(String searchParam, String[] tagNames, String sortBy, String sortOrder) {
+    public CertificateSearchParameter(String searchParam, String[] tagNames, String sortBy, String sortOrder) {
         this.searchParam = searchParam;
         this.tagNames = tagNames;
         this.sortBy = sortBy;

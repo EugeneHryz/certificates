@@ -1,18 +1,15 @@
 package com.epam.esm.repository.dao.impl;
 
-import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.dao.UserDao;
-import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;

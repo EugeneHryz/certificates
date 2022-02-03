@@ -1,4 +1,4 @@
-package com.epam.esm.web.model.converter;
+package com.epam.esm.service.dto.converter;
 
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;

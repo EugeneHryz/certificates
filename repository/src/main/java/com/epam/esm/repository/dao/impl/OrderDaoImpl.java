@@ -1,6 +1,6 @@
 package com.epam.esm.repository.dao.impl;
 
-import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.OrderDao;
 import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.entity.Order;

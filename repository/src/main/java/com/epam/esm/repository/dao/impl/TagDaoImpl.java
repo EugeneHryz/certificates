@@ -2,7 +2,7 @@ package com.epam.esm.repository.dao.impl;
 
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
-import static com.epam.esm.repository.dao.query.DatabaseColumn.*;
+import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;

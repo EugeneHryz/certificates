@@ -6,16 +6,15 @@ import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.dto.mapper.impl.TagDtoMapper;
-import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
-import com.epam.esm.service.validator.QueryParamValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class TagServiceImpl implements TagService {
@@ -25,13 +24,13 @@ public class TagServiceImpl implements TagService {
     private TagDao tagDao;
     private UserDao userDao;
 
-    private TagDtoMapper tagMapper;
+    private ConversionService conversionService;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, UserDao userDao, TagDtoMapper mapper) {
+    public TagServiceImpl(TagDao tagDao, UserDao userDao, ConversionService conversionService) {
         this.tagDao = tagDao;
         this.userDao = userDao;
-        tagMapper = mapper;
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class TagServiceImpl implements TagService {
             if (existingTag.isPresent()) {
                 throw new ServiceException("Tag with name '" + tagDto.getName() + "' already exists", TAG_CODE);
             }
-            int generatedId = tagDao.create(tagMapper.toEntity(tagDto));
+            int generatedId = tagDao.create(conversionService.convert(tagDto, Tag.class));
 
             tagDto.setId(generatedId);
             return tagDto;
@@ -57,7 +56,7 @@ public class TagServiceImpl implements TagService {
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to get tag (id = " + id + ")", TAG_CODE);
             }
-            return tagMapper.toDto(tag.get());
+            return conversionService.convert(tag, TagDto.class);
         } catch (DaoException e) {
             throw new ServiceException("Unable to get tag (id = " + id + ")", e, TAG_CODE);
         }
@@ -67,7 +66,9 @@ public class TagServiceImpl implements TagService {
     public List<TagDto> getTags(int pageNumber, int pageSize) throws ServiceException {
         try {
             List<Tag> tags = tagDao.getTags(pageSize, pageSize * pageNumber);
-            return tagMapper.toDtoList(tags);
+            return tags.stream().map(t -> conversionService.convert(t, TagDto.class))
+                    .collect(Collectors.toList());
+
         } catch (DaoException e) {
             throw new ServiceException("Unable to get tags", e, TAG_CODE);
         }
@@ -94,7 +95,7 @@ public class TagServiceImpl implements TagService {
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to find tag", TAG_CODE);
             }
-            return tagMapper.toDto(tag.get());
+            return conversionService.convert(tag, TagDto.class);
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get most widely used tag of a user " +

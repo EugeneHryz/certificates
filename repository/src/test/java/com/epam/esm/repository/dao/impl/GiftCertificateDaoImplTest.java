@@ -1,6 +1,6 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.searchoption.SearchParameter;
+import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.exception.DaoException;
@@ -94,7 +94,7 @@ public class GiftCertificateDaoImplTest {
                 LocalDateTime.parse("2005-10-11T19:01:30"), LocalDateTime.parse("2005-10-11T19:01:30"));
         expected.setId(0);
 
-        SearchParameter options = new SearchParameter("Free", "", "date", "asc");
+        CertificateSearchParameter options = new CertificateSearchParameter("Free", "", "date", "asc");
         GiftCertificate actual = certificateDao.findCertificates(options).get(0);
 
         Assertions.assertEquals(expected, actual);
