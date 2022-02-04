@@ -56,7 +56,7 @@ public class TagServiceImpl implements TagService {
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to get tag (id = " + id + ")", TAG_CODE);
             }
-            return conversionService.convert(tag, TagDto.class);
+            return conversionService.convert(tag.get(), TagDto.class);
         } catch (DaoException e) {
             throw new ServiceException("Unable to get tag (id = " + id + ")", e, TAG_CODE);
         }
@@ -95,7 +95,7 @@ public class TagServiceImpl implements TagService {
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to find tag", TAG_CODE);
             }
-            return conversionService.convert(tag, TagDto.class);
+            return conversionService.convert(tag.get(), TagDto.class);
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get most widely used tag of a user " +

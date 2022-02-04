@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
@@ -22,14 +21,11 @@ public class UserServiceImpl implements UserService {
     public static final int USER_CODE = 3;
 
     private UserDao userDao;
-    private TagDao tagDao;
-
     private ConversionService conversionService;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, TagDao tagDao, ConversionService conversionService) {
+    public UserServiceImpl(UserDao userDao, ConversionService conversionService) {
         this.userDao = userDao;
-        this.tagDao = tagDao;
         this.conversionService = conversionService;
     }
 
@@ -40,7 +36,7 @@ public class UserServiceImpl implements UserService {
             if (!user.isPresent()) {
                 throw new NoSuchElementException("Unable to get user (id = " + id + ")", USER_CODE);
             }
-            return conversionService.convert(user, UserDto.class);
+            return conversionService.convert(user.get(), UserDto.class);
         } catch (DaoException e) {
             throw new ServiceException("Unable to get user (id = " + id + ")", e, USER_CODE);
         }
@@ -50,8 +46,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers(int pageNumber, int pageSize) throws ServiceException {
         try {
             List<User> users = userDao.getUsers(pageSize, pageNumber * pageSize);
-            return users.stream().map(u -> conversionService.convert(u, UserDto.class))
-                    .collect(Collectors.toList());
+            return users.stream().map(u -> conversionService.convert(u, UserDto.class)).collect(Collectors.toList());
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to get users", e, USER_CODE);

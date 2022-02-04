@@ -52,19 +52,16 @@ public class OrderServiceImpl implements OrderService {
             if (!user.isPresent() || !certificate.isPresent()) {
                 throw new NoSuchElementException("User or certificate does not exist", ORDER_CODE);
             }
-        } catch (DaoException e) {
-            throw new ServiceException("Unable to place order", ORDER_CODE);
-        }
+            LocalDateTime purchaseDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            Order order = conversionService.convert(orderDto, Order.class);
+            order.setDate(purchaseDate);
 
-        LocalDateTime purchaseDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        Order order = new Order(orderDto.getUserId(), orderDto.getCertificateId(),
-                certificate.get().getPrice(), purchaseDate);
-        try {
             int generatedId = orderDao.create(order);
             order.setId(generatedId);
             return conversionService.convert(order, OrderDto.class);
+
         } catch (DaoException e) {
-            throw new ServiceException("Unable to create order", e, ORDER_CODE);
+            throw new ServiceException("Unable to place order", e, ORDER_CODE);
         }
     }
 

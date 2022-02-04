@@ -15,16 +15,14 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import java.util.List;
 
 @Configuration
-@EnableWebMvc
 @EnableTransactionManagement
 @ComponentScan({"com.epam.esm.web"})
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -36,16 +34,16 @@ public class WebConfig implements WebMvcConfigurer {
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
     }
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new TagModelConverter());
-        registry.addConverter(new UserModelConverter());
-        registry.addConverter(new OrderModelConverter());
-        registry.addConverter(new CertificateModelConverter());
-
-        registry.addConverter(new TagDtoConverter());
-        registry.addConverter(new UserDtoConverter());
-        registry.addConverter(new OrderDtoConverter());
-        registry.addConverter(new CertificateDtoConverter());
-    }
+//    @Override
+//    public void addFormatters(FormatterRegistry registry) {
+//        registry.addConverter(new TagModelConverter());
+//        registry.addConverter(new UserModelConverter());
+//        registry.addConverter(new OrderModelConverter());
+//        registry.addConverter(new CertificateModelConverter());
+//
+//        registry.addConverter(new TagDtoConverter());
+//        registry.addConverter(new UserDtoConverter());
+//        registry.addConverter(new OrderDtoConverter());
+//        registry.addConverter(new CertificateDtoConverter());
+//    }
 }
