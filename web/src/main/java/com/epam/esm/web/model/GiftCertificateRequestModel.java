@@ -1,40 +1,20 @@
 package com.epam.esm.web.model;
 
-import com.epam.esm.service.validator.DateValidity;
-import com.epam.esm.service.validator.FieldValidity;
-import org.springframework.hateoas.PagedModel;
-
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@DateValidity(firstDate = "created", secondDate = "lastUpdated",
-        message = "'created' date cannot be after 'lastUpdated' date")
 public class GiftCertificateRequestModel {
 
     private int id;
-
-    @FieldValidity(leftLimit = "5", rightLimit = "200",
-            message = "name must be between 5 and 200 characters in length. (null if need to be unchanged)")
     private String name;
-
-    @FieldValidity(leftLimit = "5", rightLimit = "200",
-            message = "duration must be between 5 and 200 characters in length. (null if need to be unchanged)")
     private String description;
-
-    @FieldValidity(leftLimit = "0.5", rightLimit = "10000.0",
-            message = "price must be between 0.5 and 10000.0. (value 0.0 if need to be unchanged)")
     private double price;
-
-    @FieldValidity(leftLimit = "3", rightLimit = "365",
-            message = "duration must be between 3 and 365. (value 0 if need to be unchanged)")
     private int duration;
 
     private LocalDateTime created;
     private LocalDateTime lastUpdated;
 
-    @Valid
     private List<TagRequestModel> tags;
 
     public GiftCertificateRequestModel() {

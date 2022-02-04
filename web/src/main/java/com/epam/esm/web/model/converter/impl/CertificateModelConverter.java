@@ -6,13 +6,11 @@ import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.TagRequestModel;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCertificateRequestModel, GiftCertificateDto> {
 
     @Override
@@ -21,18 +19,19 @@ public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCerti
         try {
             BeanUtils.copyProperties(certDto, source);
 
-            List<TagDto> tagsDto = source.getTags().stream().map(t -> {
-                TagDto tagDto = new TagDto();
-                try {
-                    BeanUtils.copyProperties(tagDto, t);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    // ignore ?
-                    e.printStackTrace();
-                }
-                return tagDto;
-            }).collect(Collectors.toList());
-            certDto.setTags(tagsDto);
-
+            if (source.getTags() != null) {
+                List<TagDto> tagsDto = source.getTags().stream().map(t -> {
+                    TagDto tagDto = new TagDto();
+                    try {
+                        BeanUtils.copyProperties(tagDto, t);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        // ignore ?
+                        e.printStackTrace();
+                    }
+                    return tagDto;
+                }).collect(Collectors.toList());
+                certDto.setTags(tagsDto);
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -45,17 +44,18 @@ public class CertificateModelConverter extends AbstractTwoWayConverter<GiftCerti
         try {
             BeanUtils.copyProperties(certModel, source);
 
-            List<TagRequestModel> tagsModel = source.getTags().stream().map(t -> {
-                TagRequestModel tagModel = new TagRequestModel();
-                try {
-                    BeanUtils.copyProperties(tagModel, t);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                return tagModel;
-            }).collect(Collectors.toList());
-            certModel.setTags(tagsModel);
-
+            if (source.getTags() != null) {
+                List<TagRequestModel> tagsModel = source.getTags().stream().map(t -> {
+                    TagRequestModel tagModel = new TagRequestModel();
+                    try {
+                        BeanUtils.copyProperties(tagModel, t);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    return tagModel;
+                }).collect(Collectors.toList());
+                certModel.setTags(tagsModel);
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

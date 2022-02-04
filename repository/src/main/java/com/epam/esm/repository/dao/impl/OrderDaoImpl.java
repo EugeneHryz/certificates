@@ -38,7 +38,7 @@ public class OrderDaoImpl implements OrderDao {
                 statement.setInt(1, entity.getUserId());
                 statement.setInt(2, entity.getCertificateId());
                 statement.setDouble(3, entity.getTotal());
-                statement.setTimestamp(4, Timestamp.valueOf(entity.getDate()));
+                statement.setTimestamp(4, Timestamp.valueOf(entity.getPurchaseDate()));
                 return statement;
             }, keyHolder);
 
@@ -112,7 +112,7 @@ public class OrderDaoImpl implements OrderDao {
         order.setUserId(rs.getInt(ORDER_USER_ID));
         order.setCertificateId(rs.getInt(ORDER_CERTIFICATE_ID));
         order.setTotal(rs.getDouble(ORDER_TOTAL));
-        order.setDate(rs.getTimestamp(ORDER_PURCHASE_DATE).toLocalDateTime());
+        order.setPurchaseDate(rs.getTimestamp(ORDER_PURCHASE_DATE).toLocalDateTime());
         return order;
     }
 }

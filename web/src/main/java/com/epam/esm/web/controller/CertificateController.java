@@ -11,7 +11,11 @@ import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.hateoas.CertificateModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedCertificateModelAssembler;
+import com.epam.esm.web.validator.CertificateModelValidator;
+import com.epam.esm.web.validator.TagModelValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -19,6 +23,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,11 +46,16 @@ public class CertificateController {
     public CertificateController(GiftCertificateService certService,
                                  CertificateModelAssembler certificateAssembler,
                                  PagedCertificateModelAssembler pagedAssembler,
-                                 ConversionService service) {
+                                 ConversionService conversionService) {
         this.certificateService = certService;
         this.certificateAssembler = certificateAssembler;
         this.pagedCertificateAssembler = pagedAssembler;
-        conversionService = service;
+        this.conversionService = conversionService;
+    }
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(new CertificateModelValidator(new TagModelValidator()));
     }
 
     /**
@@ -163,11 +174,9 @@ public class CertificateController {
         return certificateAssembler.toModel(certModel);
     }
 
-    // fixme: duplicated code
     private String extractValidationErrorMessage(BindingResult bindingResult) {
-        Optional<String> message = bindingResult.getAllErrors().stream()
-                .map(error -> error.getDefaultMessage()).findFirst();
-
-        return message.orElse("No message");
+        List<ObjectError> errors = bindingResult.getAllErrors();
+        return errors.stream().map(DefaultMessageSourceResolvable::getCode)
+                .collect(Collectors.joining(" "));
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class TagDtoConverter extends AbstractTwoWayConverter<TagDto, Tag> {
 
     @Override

@@ -8,16 +8,16 @@ public class Order extends AbstractEntity {
     private int userId;
     private int certificateId;
     private double total;
-    private LocalDateTime date;
+    private LocalDateTime purchaseDate;
 
     public Order() {
     }
 
-    public Order(int userId, int certificateId, double total, LocalDateTime date) {
+    public Order(int userId, int certificateId, double total, LocalDateTime purchaseDate) {
         this.userId = userId;
         this.certificateId = certificateId;
         this.total = total;
-        this.date = date;
+        this.purchaseDate = purchaseDate;
     }
 
     public int getUserId() {
@@ -44,12 +44,12 @@ public class Order extends AbstractEntity {
         this.total = total;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     @Override
@@ -59,11 +59,11 @@ public class Order extends AbstractEntity {
         Order order = (Order) o;
         return userId == order.userId && certificateId == order.certificateId
                 && Double.compare(order.total, total) == 0 && getId() == order.getId()
-                && date.isEqual(order.date);
+                && purchaseDate.isEqual(order.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), userId, certificateId, total, date);
+        return Objects.hash(getId(), userId, certificateId, total, purchaseDate);
     }
 }
