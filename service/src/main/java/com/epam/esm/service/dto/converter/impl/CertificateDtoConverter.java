@@ -4,11 +4,9 @@ import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertificateDto, GiftCertificate> {
 
     @Override
@@ -18,7 +16,6 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
             BeanUtils.copyProperties(certificate, source);
         } catch (IllegalAccessException | InvocationTargetException e) {
             // ignore
-            e.printStackTrace();
         }
         return certificate;
     }
@@ -30,7 +27,6 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
             BeanUtils.copyProperties(certificateDto, source);
         } catch (IllegalAccessException | InvocationTargetException e) {
             // ignore
-            e.printStackTrace();
         }
         return certificateDto;
     }

@@ -1,31 +1,42 @@
 package com.epam.esm.repository.entity;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "certificate_order")
 public class Order extends AbstractEntity {
 
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Transient
     private int certificateId;
+
+    @Column(nullable = false)
     private double total;
-    private LocalDateTime date;
+
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime purchaseDate;
 
     public Order() {
     }
 
-    public Order(int userId, int certificateId, double total, LocalDateTime date) {
-        this.userId = userId;
+    public Order(User user, int certificateId, double total, LocalDateTime date) {
+        this.user = user;
         this.certificateId = certificateId;
         this.total = total;
-        this.date = date;
+        this.purchaseDate = date;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public int getCertificateId() {
@@ -44,12 +55,12 @@ public class Order extends AbstractEntity {
         this.total = total;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     @Override
@@ -57,13 +68,13 @@ public class Order extends AbstractEntity {
         if (this == o) return true;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
-        return userId == order.userId && certificateId == order.certificateId
+        return user.equals(order.user) && certificateId == order.certificateId
                 && Double.compare(order.total, total) == 0 && getId() == order.getId()
-                && date.isEqual(order.date);
+                && purchaseDate.isEqual(order.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), userId, certificateId, total, date);
+        return Objects.hash(getId(), user, certificateId, total, purchaseDate);
     }
 }

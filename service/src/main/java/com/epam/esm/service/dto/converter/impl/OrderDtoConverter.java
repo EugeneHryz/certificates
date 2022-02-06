@@ -4,11 +4,9 @@ import com.epam.esm.repository.entity.Order;
 import com.epam.esm.service.dto.OrderDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class OrderDtoConverter extends AbstractTwoWayConverter<OrderDto, Order> {
 
     @Override

@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
             }
             LocalDateTime purchaseDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             Order order = conversionService.convert(orderDto, Order.class);
-            order.setDate(purchaseDate);
+            order.setPurchaseDate(purchaseDate);
 
             int generatedId = orderDao.create(order);
             order.setId(generatedId);
@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto getUserOrder(int userId, int orderId) throws ServiceException, NoSuchElementException {
         try {
             Optional<Order> order = orderDao.findById(orderId);
-            if (!order.isPresent() || order.get().getUserId() != userId) {
+            if (!order.isPresent() || order.get().getUser().getId() != userId) {
                 throw new NoSuchElementException("Cannot find order (orderId = " + orderId +
                         ") for a user (userId = " + userId + ")", ORDER_CODE);
             }

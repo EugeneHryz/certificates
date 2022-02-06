@@ -25,7 +25,7 @@
 //    public void setUp() {
 //        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
 //        embeddedDatabase = builder.generateUniqueName(true)
-//                .addScript("script.sql")
+//                .addScript("data.sql")
 //                .build();
 //    }
 //

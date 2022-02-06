@@ -4,11 +4,9 @@ import com.epam.esm.repository.entity.User;
 import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class UserDtoConverter extends AbstractTwoWayConverter<UserDto, User> {
 
     @Override

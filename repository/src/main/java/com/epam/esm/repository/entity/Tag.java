@@ -1,9 +1,13 @@
 package com.epam.esm.repository.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.util.Objects;
 
+@Entity
 public class Tag extends AbstractEntity {
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     public Tag() {

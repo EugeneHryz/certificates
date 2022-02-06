@@ -20,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import java.util.List;
 
 @Configuration
-@EnableTransactionManagement
 @ComponentScan({"com.epam.esm.web"})
 public class WebConfig extends WebMvcConfigurationSupport {
 
@@ -34,16 +33,16 @@ public class WebConfig extends WebMvcConfigurationSupport {
         converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
     }
 
-//    @Override
-//    public void addFormatters(FormatterRegistry registry) {
-//        registry.addConverter(new TagModelConverter());
-//        registry.addConverter(new UserModelConverter());
-//        registry.addConverter(new OrderModelConverter());
-//        registry.addConverter(new CertificateModelConverter());
-//
-//        registry.addConverter(new TagDtoConverter());
-//        registry.addConverter(new UserDtoConverter());
-//        registry.addConverter(new OrderDtoConverter());
-//        registry.addConverter(new CertificateDtoConverter());
-//    }
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new TagModelConverter());
+        registry.addConverter(new UserModelConverter());
+        registry.addConverter(new OrderModelConverter());
+        registry.addConverter(new CertificateModelConverter());
+
+        registry.addConverter(new TagDtoConverter());
+        registry.addConverter(new UserDtoConverter());
+        registry.addConverter(new OrderDtoConverter());
+        registry.addConverter(new CertificateDtoConverter());
+    }
 }

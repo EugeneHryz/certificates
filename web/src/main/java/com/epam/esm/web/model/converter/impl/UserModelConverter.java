@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class UserModelConverter extends AbstractTwoWayConverter<UserRequestModel, UserDto> {
 
     @Override

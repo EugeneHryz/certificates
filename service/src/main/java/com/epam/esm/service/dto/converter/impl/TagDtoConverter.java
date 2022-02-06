@@ -4,11 +4,9 @@ import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Component
 public class TagDtoConverter extends AbstractTwoWayConverter<TagDto, Tag> {
 
     @Override
