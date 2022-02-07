@@ -12,8 +12,9 @@ public class Order extends AbstractEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Transient
-    private int certificateId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "certificate_id", nullable = false)
+    private GiftCertificate certificate;
 
     @Column(nullable = false)
     private double total;
@@ -24,9 +25,9 @@ public class Order extends AbstractEntity {
     public Order() {
     }
 
-    public Order(User user, int certificateId, double total, LocalDateTime date) {
+    public Order(User user, GiftCertificate certificate, double total, LocalDateTime date) {
         this.user = user;
-        this.certificateId = certificateId;
+        this.certificate = certificate;
         this.total = total;
         this.purchaseDate = date;
     }
@@ -39,12 +40,12 @@ public class Order extends AbstractEntity {
         this.user = user;
     }
 
-    public int getCertificateId() {
-        return certificateId;
+    public GiftCertificate getCertificate() {
+        return certificate;
     }
 
-    public void setCertificateId(int certificateId) {
-        this.certificateId = certificateId;
+    public void setCertificate(GiftCertificate certificate) {
+        this.certificate = certificate;
     }
 
     public double getTotal() {
@@ -68,13 +69,13 @@ public class Order extends AbstractEntity {
         if (this == o) return true;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
-        return user.equals(order.user) && certificateId == order.certificateId
+        return user.equals(order.user) && certificate.equals(order.certificate)
                 && Double.compare(order.total, total) == 0 && getId() == order.getId()
                 && purchaseDate.isEqual(order.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), user, certificateId, total, purchaseDate);
+        return Objects.hash(getId(), user, certificate, total, purchaseDate);
     }
 }

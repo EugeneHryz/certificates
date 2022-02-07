@@ -1,11 +1,15 @@
 package com.epam.esm.service.dto.converter.impl;
 
 import com.epam.esm.repository.entity.GiftCertificate;
+import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertificateDto, GiftCertificate> {
 
@@ -14,6 +18,20 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
         GiftCertificate certificate = new GiftCertificate();
         try {
             BeanUtils.copyProperties(certificate, source);
+
+//            if (source.getTags() != null) {
+//                List<Tag> tags = source.getTags().stream().map(t -> {
+//                    Tag tag = new Tag();
+//                    try {
+//                        BeanUtils.copyProperties(tag, t);
+//                    } catch (IllegalAccessException | InvocationTargetException e) {
+//                        // ignore ?
+//                        e.printStackTrace();
+//                    }
+//                    return tag;
+//                }).collect(Collectors.toList());
+//                certificate.setTags(tags);
+//            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             // ignore
         }
@@ -25,6 +43,20 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
         GiftCertificateDto certificateDto = new GiftCertificateDto();
         try {
             BeanUtils.copyProperties(certificateDto, source);
+
+//            if (source.getTags() != null) {
+//                List<TagDto> tagsDto = source.getTags().stream().map(t -> {
+//                    TagDto tagDto = new TagDto();
+//                    try {
+//                        BeanUtils.copyProperties(tagDto, t);
+//                    } catch (IllegalAccessException | InvocationTargetException e) {
+//                        // ignore ?
+//                        e.printStackTrace();
+//                    }
+//                    return tagDto;
+//                }).collect(Collectors.toList());
+//                certificateDto.setTags(tagsDto);
+//            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             // ignore
         }

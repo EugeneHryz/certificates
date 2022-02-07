@@ -3,11 +3,8 @@ package com.epam.esm.repository.dao.impl;
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import static com.epam.esm.repository.dao.query.DatabaseName.*;
-import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
@@ -16,16 +13,12 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @Transactional
 public class TagDaoImpl implements TagDao {
-
-    private JdbcOperations jdbcOperations;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -88,18 +81,9 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    // todo: !!!
     public List<Tag> findTagsForCertificate(GiftCertificate cert) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(CT_MAPPING_TABLE, TAG_TABLE + "." + TAG_ID, TAG_NAME)
-                .addInnerJoinClause(TAG_TABLE, TAG_TABLE + "." + TAG_ID + " = " + CT_MAPPING_TAG_ID)
-                .addWhereClause(CT_MAPPING_CERTIFICATE_ID + " = ?");
-
-        try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapTag, cert.getId());
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find tags for certificate (id = " + cert.getId() + ")", e);
-        }
+        GiftCertificate certificate = entityManager.find(GiftCertificate.class, cert.getId());
+        return certificate.getTags();
     }
 
     @Override
@@ -110,11 +94,5 @@ public class TagDaoImpl implements TagDao {
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Tag.class)));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
         return query.getSingleResult();
-    }
-
-    private Tag mapTag(ResultSet resultSet, int rowNum) throws SQLException {
-        Tag tag = new Tag(resultSet.getString(TAG_NAME));
-        tag.setId(resultSet.getInt(TAG_ID));
-        return tag;
     }
 }

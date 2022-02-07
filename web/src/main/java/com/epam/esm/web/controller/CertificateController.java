@@ -3,7 +3,6 @@ package com.epam.esm.web.controller;
 import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
@@ -63,9 +62,6 @@ public class CertificateController {
         }
 
         GiftCertificateDto gcDto = conversionService.convert(gcRequestModel, GiftCertificateDto.class);
-        List<TagDto> tagsDto = gcRequestModel.getTags().stream()
-                .map(c -> conversionService.convert(c, TagDto.class)).collect(Collectors.toList());
-        gcDto.setTags(tagsDto);
 
         GiftCertificateRequestModel certificateModel = conversionService.convert(
                 certificateService.createCertificate(gcDto), GiftCertificateRequestModel.class);
@@ -111,7 +107,7 @@ public class CertificateController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "2") int size) throws ServiceException, InvalidRequestDataException {
 
-        // todo: validate this???
+        // todo: validate this?
         CertificateSearchParameter searchParameter = new CertificateSearchParameter(searchParam, tags, sortBy, sortOrder);
 
         List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParameter, page, size);

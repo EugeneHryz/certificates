@@ -4,7 +4,6 @@ import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.OrderDao;
 import com.epam.esm.repository.entity.Order;
 import com.epam.esm.repository.exception.DaoException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -18,8 +17,6 @@ import java.util.Optional;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
-
-    private JdbcOperations jdbcOperations;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -37,7 +34,7 @@ public class OrderDaoImpl implements OrderDao {
         CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
 
         Root<Order> orderRoot = criteriaQuery.from(Order.class);
-        criteriaQuery.select(orderRoot).where(criteriaBuilder.equal(orderRoot.get(ORDER_USER_ID), userId));
+        criteriaQuery.select(orderRoot).where(criteriaBuilder.equal(orderRoot.get("user").get(USER_ID), userId));
         TypedQuery<Order> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult(offset);
         query.setMaxResults(limit);
@@ -59,7 +56,7 @@ public class OrderDaoImpl implements OrderDao {
 
         Root<Order> orderRoot = criteriaQuery.from(Order.class);
         criteriaQuery.select(criteriaBuilder.count(orderRoot));
-        criteriaQuery.where(criteriaBuilder.equal(orderRoot.get(ORDER_USER_ID), userId));
+        criteriaQuery.where(criteriaBuilder.equal(orderRoot.get("user").get(USER_ID), userId));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
 
         return query.getSingleResult();

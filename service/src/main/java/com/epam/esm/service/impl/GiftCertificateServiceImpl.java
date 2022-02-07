@@ -56,10 +56,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
                 throw new InvalidRequestDataException("Invalid date parameters specified", CERTIFICATE_CODE);
             }
-            generatedId = certificateDao.create(conversionService.convert(gcDto, GiftCertificate.class));
-            gcDto.setId(generatedId);
         } catch (DaoException e) {
-            throw new ServiceException("Unable to create certificate", e, CERTIFICATE_CODE);
+            throw new ServiceException("Unable to check certificate uniqueness", e, CERTIFICATE_CODE);
         }
 
         if (gcDto.getTags() != null && !gcDto.getTags().isEmpty()) {
@@ -78,16 +76,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 }
                 tag.setId(id);
             }
-            try {
-                Optional<GiftCertificate> createdCert = certificateDao.findById(generatedId);
-                if (createdCert.isPresent()) {
-                    for (TagDto tag : gcDto.getTags()) {
-                        certificateDao.createCertificateTagMapping(generatedId, tag.getId());
-                    }
-                }
-            } catch (DaoException e) {
-                throw new ServiceException("Error occurred during certificate creation", e, CERTIFICATE_CODE);
-            }
+        }
+        try {
+            // fixme:
+            generatedId = certificateDao.create(conversionService.convert(gcDto, GiftCertificate.class));
+            gcDto.setId(generatedId);
+
+        } catch (DaoException e) {
+            throw new ServiceException("Error occurred during certificate creation", e, CERTIFICATE_CODE);
         }
         return gcDto;
     }
@@ -134,13 +130,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         for (GiftCertificate cert : certificates) {
             GiftCertificateDto certDto = conversionService.convert(cert, GiftCertificateDto.class);
 
-            List<Tag> tags;
-            try {
-                tags = tagDao.findTagsForCertificate(cert);
-            } catch (DaoException e) {
-                throw new ServiceException("Unable to find tags for certificate with id = "
-                        + cert.getId(), e, CERTIFICATE_CODE);
-            }
+            List<Tag> tags = cert.getTags();
             List<TagDto> tagsDto = tags.stream().map(t -> conversionService.convert(t, TagDto.class))
                     .collect(Collectors.toList());
             certDto.setTags(tagsDto);
@@ -162,6 +152,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Transactional
     @Override
+    // fixme:
     public GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException, InvalidRequestDataException {
         Optional<GiftCertificate> oldCert;
         try {
@@ -186,7 +177,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                         // if the certificate is not associated with that tag
                         if (existingTags.stream().noneMatch(t -> t.equals(tag.get()))) {
                             // create mapping
-                            certificateDao.createCertificateTagMapping(newCert.getId(), tag.get().getId());
+//                            certificateDao.createCertificateTagMapping(newCert.getId(), tag.get().getId());
                         }
                     } else {    // if supplied tag doesn't exist
                         // create new tag
@@ -194,7 +185,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                         if (generatedId > 0) {
 
                             // create mapping for that tag
-                            certificateDao.createCertificateTagMapping(newCert.getId(), generatedId);
+//                            certificateDao.createCertificateTagMapping(newCert.getId(), generatedId);
                         }
                     }
                 }
