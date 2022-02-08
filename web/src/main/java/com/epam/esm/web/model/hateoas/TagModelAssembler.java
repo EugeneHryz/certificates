@@ -19,7 +19,9 @@ public class TagModelAssembler implements RepresentationModelAssembler<TagReques
             return EntityModel.of(entity, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
                             .getTag(entity.getId())).withSelfRel(),
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
-                            .getTags(0, 2)).withRel("tags"));
+                            .getTags(0, 2)).withRel("tags"),
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
+                            .deleteTag(entity.getId())).withRel("delete"));
         } catch (NoSuchElementException | ServiceException e) {
             // ignore
             e.printStackTrace();

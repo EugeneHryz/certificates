@@ -53,10 +53,11 @@ public class OrderDaoImpl implements OrderDao {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.addSelectClause(ORDER_TABLE, ORDER_ID, ORDER_USER_ID, ORDER_CERTIFICATE_ID,
                 ORDER_TOTAL, ORDER_PURCHASE_DATE)
+                .addWhereClause(ORDER_USER_ID + " = ?")
                 .addLimitAndOffset();
 
         try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapOrder, limit, offset);
+            return jdbcOperations.query(queryBuilder.build(), this::mapOrder, userId, limit, offset);
         } catch (DataAccessException e) {
             throw new DaoException("Unable to get user orders (userId = " + userId + ")", e);
         }

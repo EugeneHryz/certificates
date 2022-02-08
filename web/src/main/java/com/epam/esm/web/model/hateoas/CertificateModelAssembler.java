@@ -9,6 +9,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResultUtils;
 
 @Component
 public class CertificateModelAssembler implements RepresentationModelAssembler<GiftCertificateRequestModel,
@@ -21,7 +22,11 @@ public class CertificateModelAssembler implements RepresentationModelAssembler<G
                             .getGiftCertificate(entity.getId())).withSelfRel(),
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
                             .getCertificates("", new String[] {}, "date",
-                                    "asc", 0, 2)).withRel("certificates"));
+                                    "asc", 0, 2)).withRel("certificates"),
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
+                            .updateGiftCertificate(entity, null, entity.getId())).withRel("update"),
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
+                            .deleteCertificate(entity.getId())).withRel("delete"));
         } catch (ServiceException | NoSuchElementException | InvalidRequestDataException e) {
             // ignore
             e.printStackTrace();

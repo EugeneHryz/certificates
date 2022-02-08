@@ -156,6 +156,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 throw new NoSuchElementException("Unable to delete certificate (id = " + id + ")", CERTIFICATE_CODE);
             }
         } catch (DaoException e) {
+            e.printStackTrace();
             throw new ServiceException("Unable to delete certificate (id = " + id + ")", e, CERTIFICATE_CODE);
         }
     }

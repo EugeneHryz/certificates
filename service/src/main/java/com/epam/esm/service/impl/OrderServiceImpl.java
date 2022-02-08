@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getUserOrders(int userId, int pageNumber, int pageSize) throws ServiceException {
         try {
             List<Order> userOrders = orderDao.getUserOrders(userId, pageSize, pageNumber * pageSize);
-            return userOrders.stream().map(u -> conversionService.convert(u, OrderDto.class))
+            return userOrders.stream().map(o -> conversionService.convert(o, OrderDto.class))
                     .collect(Collectors.toList());
 
         } catch (DaoException e) {

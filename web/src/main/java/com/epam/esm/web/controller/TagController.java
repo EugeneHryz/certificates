@@ -9,6 +9,8 @@ import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.web.model.TagRequestModel;
 import com.epam.esm.web.model.hateoas.TagModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedTagModelAssembler;
+import com.epam.esm.web.validator.CertificateModelValidator;
+import com.epam.esm.web.validator.TagModelValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.hateoas.EntityModel;
@@ -17,6 +19,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,6 +44,11 @@ public class TagController {
         this.tagAssembler = tagAssembler;
         this.pagedTagAssembler = pagedTagAssembler;
         this.conversionService = conversionService;
+    }
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(new TagModelValidator());
     }
 
     /**
@@ -104,8 +112,9 @@ public class TagController {
      */
     @DeleteMapping(value = "/{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTag(@PathVariable int id) throws ServiceException, NoSuchElementException {
+    public ResponseEntity<Void> deleteTag(@PathVariable int id) throws ServiceException, NoSuchElementException {
         tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/widelyUsedTag", produces = {"application/json"})

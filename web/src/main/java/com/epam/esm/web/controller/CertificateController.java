@@ -3,7 +3,6 @@ package com.epam.esm.web.controller;
 import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
@@ -14,7 +13,6 @@ import com.epam.esm.web.model.hateoas.pagination.impl.PagedCertificateModelAssem
 import com.epam.esm.web.validator.CertificateModelValidator;
 import com.epam.esm.web.validator.TagModelValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.hateoas.EntityModel;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -72,12 +69,7 @@ public class CertificateController {
             String errorMessage = extractValidationErrorMessage(result);
             throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
-
         GiftCertificateDto gcDto = conversionService.convert(gcRequestModel, GiftCertificateDto.class);
-        List<TagDto> tagsDto = gcRequestModel.getTags().stream()
-                .map(c -> conversionService.convert(c, TagDto.class)).collect(Collectors.toList());
-        gcDto.setTags(tagsDto);
-
         GiftCertificateRequestModel certificateModel = conversionService.convert(
                 certificateService.createCertificate(gcDto), GiftCertificateRequestModel.class);
 
@@ -122,7 +114,6 @@ public class CertificateController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "2") int size) throws ServiceException, InvalidRequestDataException {
 
-        // todo: validate this???
         CertificateSearchParameter searchParameter = new CertificateSearchParameter(searchParam, tags, sortBy, sortOrder);
 
         List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParameter, page, size);
@@ -138,14 +129,13 @@ public class CertificateController {
      * delete certificate with specified id
      *
      * @param id certificate id
-     * @return deleted certificate id, if successful
      * @throws ServiceException if an error occurs
      * @throws NoSuchElementException if there's no such certificate with specified id
      */
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCertificate(@PathVariable int id) throws ServiceException, NoSuchElementException {
+    public ResponseEntity<Void> deleteCertificate(@PathVariable int id) throws ServiceException, NoSuchElementException {
         certificateService.deleteCertificate(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
