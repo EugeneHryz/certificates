@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.config.DaoConfig;
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.dao.OrderDao;
 import com.epam.esm.repository.dao.UserDao;
@@ -8,6 +9,7 @@ import com.epam.esm.repository.entity.Order;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.service.config.TestConfig;
 import com.epam.esm.service.dto.OrderDto;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
@@ -34,7 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
 public class OrderServiceImplTest {
 
     @Autowired
@@ -98,6 +100,20 @@ public class OrderServiceImplTest {
 
         OrderService orderService = new OrderServiceImpl(orderDao, userDao, certificateDao, conversionService);
         Assertions.assertThrows(ServiceException.class, () -> orderService.placeOrder(orderDto));
+    }
+
+    @Test
+    public void getUserOrderShouldBeCorrect() throws DaoException, ServiceException, NoSuchElementException {
+        Order order = new Order(9, 67, 134.1,
+                LocalDateTime.parse("2020-11-11T11:18:30"));
+        order.setId(3);
+
+        Mockito.when(orderDao.findById(3)).thenReturn(Optional.of(order));
+        OrderService orderService = new OrderServiceImpl(orderDao, userDao, certificateDao, conversionService);
+
+        OrderDto expected = conversionService.convert(order, OrderDto.class);
+        OrderDto actual = orderService.getUserOrder(9, 3);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test

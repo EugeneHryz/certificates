@@ -1,9 +1,11 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.config.DaoConfig;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.UserService;
+import com.epam.esm.service.config.TestConfig;
 import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.anyInt;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
 public class UserServiceImplTest {
 
     @Autowired

@@ -88,10 +88,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto getMostWidelyUsedTagOfUserWithHighestSpending() throws ServiceException, NoSuchElementException {
         try {
-            int userWithHighestSpending = userDao.getUserIdWithHighestSpending();
-
-            int mostWidelyUsedTagId = userDao.findMostWidelyUsedUserTagId(userWithHighestSpending);
-            Optional<Tag> tag = tagDao.findById(mostWidelyUsedTagId);
+            Optional<Tag> tag = tagDao.findMostWidelyUsedTagOfUserWithHighestSpending();
             if (!tag.isPresent()) {
                 throw new NoSuchElementException("Unable to find tag", TAG_CODE);
             }

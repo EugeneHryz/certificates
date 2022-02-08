@@ -1,10 +1,12 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.config.DaoConfig;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.service.config.TestConfig;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
@@ -30,7 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
 public class TagServiceImplTest {
 
     @Autowired
@@ -182,18 +184,14 @@ public class TagServiceImplTest {
 
     @Test
     public void getMostWidelyUsedTagOfUserWithHighestSpendingShouldBeCorrect() throws DaoException, ServiceException, NoSuchElementException {
-        int userId = 24;
-        int tagId = 11;
-        Mockito.when(userDao.getUserIdWithHighestSpending()).thenReturn(userId);
-        Mockito.when(userDao.findMostWidelyUsedUserTagId(userId)).thenReturn(tagId);
-
         Tag tag = new Tag("flight to Philippines for 10 days");
-        tag.setId(tagId);
-        Mockito.when(tagDao.findById(tagId)).thenReturn(Optional.of(tag));
+        tag.setId(11);
+
+        Mockito.when(tagDao.findMostWidelyUsedTagOfUserWithHighestSpending()).thenReturn(Optional.of(tag));
         TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
 
         TagDto expected = new TagDto("flight to Philippines for 10 days");
-        expected.setId(tagId);
+        expected.setId(11);
         TagDto actual = tagService.getMostWidelyUsedTagOfUserWithHighestSpending();
         Assertions.assertEquals(expected, actual);
     }

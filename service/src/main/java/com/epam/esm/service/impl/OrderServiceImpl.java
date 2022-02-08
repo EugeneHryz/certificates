@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new NoSuchElementException("Cannot find order (orderId = " + orderId +
                         ") for a user (userId = " + userId + ")", ORDER_CODE);
             }
-            return conversionService.convert(order, OrderDto.class);
+            return conversionService.convert(order.get(), OrderDto.class);
 
         } catch (DaoException e) {
             throw new ServiceException("Unable to find order (orderId = " + orderId + ")", e, ORDER_CODE);

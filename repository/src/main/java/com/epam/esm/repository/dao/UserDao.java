@@ -11,8 +11,4 @@ public interface UserDao extends BaseDao<User> {
 
     long getCount() throws DaoException;
 
-
-    int getUserIdWithHighestSpending() throws DaoException;
-
-    int findMostWidelyUsedUserTagId(int userId) throws DaoException;
 }

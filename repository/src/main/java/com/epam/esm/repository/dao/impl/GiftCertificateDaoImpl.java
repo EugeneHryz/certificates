@@ -94,12 +94,13 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findCertificates(CertificateSearchParameter options, int limit, int offset) throws DaoException {
-        SqlQueryBuilder queryBuilder = constructGetCertificatesQueryBuilder(options);
+        SqlQueryBuilder queryBuilder = constructGetCertificatesQueryBuilder(options, false);
 
         String sortColumn = options.getSortBy().equals("date") ? CERTIFICATE_LAST_UPDATE_DATE : CERTIFICATE_NAME;
         queryBuilder.addOrderByClause(sortColumn, options.getSortOrder())
                 .addLimitAndOffset();
         try {
+            System.out.println(queryBuilder.build());
             return jdbcOperations.query(queryBuilder.build(), this::mapGiftCertificate, limit, offset);
         } catch (DataAccessException e) {
             throw new DaoException("Unable to find certificates with specified parameters", e);
@@ -157,36 +158,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long getCount(CertificateSearchParameter options) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-
-        String where = "";
-        if (options.getTagNames() == null || options.getTagNames().length == 0) {
-            queryBuilder.addSelectClause(CERTIFICATE_TABLE, "COUNT(*)");
-        } else {
-            SqlQueryBuilder subqueryBuilder = new SqlQueryBuilder();
-            subqueryBuilder.addSelectClause(TAG_TABLE, TAG_ID);
-
-            StringBuilder tagsCondition = new StringBuilder();
-            String[] tagNames = options.getTagNames();
-            for (String tagName : tagNames) {
-                tagsCondition.append(TAG_NAME + " = '")
-                        .append(tagName)
-                        .append("'");
-                if (!Objects.equals(tagNames[tagNames.length - 1], tagName)) {
-                    tagsCondition.append(" OR ");
-                }
-            }
-            subqueryBuilder.addWhereClause(tagsCondition.toString());
-
-            queryBuilder.addSelectClause(CT_MAPPING_TABLE, "COUNT(*)")
-                    .addInnerJoinClause(CERTIFICATE_TABLE, CERTIFICATE_TABLE + "." +
-                            CERTIFICATE_ID + " = " + CT_MAPPING_CERTIFICATE_ID);
-            where = CT_MAPPING_TAG_ID + " IN (" + subqueryBuilder.build() + ") AND ";
-        }
-        queryBuilder.addWhereClause(where + "(" + CERTIFICATE_NAME + " LIKE '%" + options.getSearchParam() + "%' OR " +
-                CERTIFICATE_DESCRIPTION + " LIKE '%" + options.getSearchParam() + "%')");
+        SqlQueryBuilder queryBuilder = constructGetCertificatesQueryBuilder(options, true);
 
         try {
+            System.out.println(queryBuilder.build());
             Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
             return count != null ? count : -1L;
         } catch (DataAccessException e) {
@@ -194,16 +169,17 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }
     }
 
-    private SqlQueryBuilder constructGetCertificatesQueryBuilder(CertificateSearchParameter options) {
+    private SqlQueryBuilder constructGetCertificatesQueryBuilder(CertificateSearchParameter options, boolean count) {
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
 
-        String where = "";
-        if (options.getTagNames() == null || options.getTagNames().length == 0) {
-            addSelectClauseForAllColumns(queryBuilder);
+        if (count) {
+            queryBuilder.addSelectClause(CERTIFICATE_TABLE, "COUNT(*)");
         } else {
-            SqlQueryBuilder subqueryBuilder = new SqlQueryBuilder();
-            subqueryBuilder.addSelectClause(TAG_TABLE, TAG_ID);
-
+            addSelectClauseForAllColumns(queryBuilder);
+        }
+        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+            SqlQueryBuilder firstSubqueryBuilder = new SqlQueryBuilder();
+            firstSubqueryBuilder.addSelectClause(TAG_TABLE, TAG_ID);
             StringBuilder tagsCondition = new StringBuilder();
             String[] tagNames = options.getTagNames();
             for (String tagName : tagNames) {
@@ -214,15 +190,19 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                     tagsCondition.append(" OR ");
                 }
             }
-            subqueryBuilder.addWhereClause(tagsCondition.toString());
+            firstSubqueryBuilder.addWhereClause(tagsCondition.toString());
 
-            queryBuilder.addSelectClause(CT_MAPPING_TABLE, CERTIFICATE_TABLE + "." + CERTIFICATE_ID,
-                    CERTIFICATE_NAME, CERTIFICATE_DESCRIPTION, CERTIFICATE_PRICE, CERTIFICATE_DURATION,
-                    CERTIFICATE_CREATE_DATE, CERTIFICATE_LAST_UPDATE_DATE);
-            queryBuilder.addInnerJoinClause(CERTIFICATE_TABLE, CERTIFICATE_TABLE + "." + CERTIFICATE_ID + " = " + CT_MAPPING_CERTIFICATE_ID);
-            where = CT_MAPPING_TAG_ID + " IN (" + subqueryBuilder.build() + ") AND ";
+            SqlQueryBuilder secondSubqueryBuilder = new SqlQueryBuilder();
+            secondSubqueryBuilder.addSelectClause(CT_MAPPING_TABLE, CT_MAPPING_CERTIFICATE_ID)
+                    .addWhereClause(CT_MAPPING_TAG_ID + " IN (" + firstSubqueryBuilder.build() + ")")
+                    .addGroupByClause(CT_MAPPING_CERTIFICATE_ID)
+                    .addHavingClause("COUNT(*) = " + tagNames.length);
+
+            String secondSubqueryAlias = "mc";
+            queryBuilder.addInnerJoinClause("(" + secondSubqueryBuilder.build() + ") " +
+                    secondSubqueryAlias, CT_MAPPING_CERTIFICATE_ID + " = " + CERTIFICATE_ID);
         }
-        queryBuilder.addWhereClause(where + "(" + CERTIFICATE_NAME + " LIKE '%" + options.getSearchParam() + "%' OR " +
+        queryBuilder.addWhereClause("(" + CERTIFICATE_NAME + " LIKE '%" + options.getSearchParam() + "%' OR " +
                 CERTIFICATE_DESCRIPTION + " LIKE '%" + options.getSearchParam() + "%')");
 
         return queryBuilder;

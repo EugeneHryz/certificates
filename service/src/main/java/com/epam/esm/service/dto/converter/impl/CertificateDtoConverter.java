@@ -4,7 +4,6 @@ import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 

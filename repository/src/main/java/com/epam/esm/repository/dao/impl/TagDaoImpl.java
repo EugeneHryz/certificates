@@ -143,6 +143,38 @@ public class TagDaoImpl implements TagDao {
         }
     }
 
+    @Override
+    public Optional<Tag> findMostWidelyUsedTagOfUserWithHighestSpending() throws DaoException {
+        String query = "SELECT tag.id, name\n" +
+                "        FROM tag\n" +
+                "        INNER JOIN (SELECT ct.tag_id as 'tagId', COUNT(*) AS frequency\n" +
+                "        FROM (SELECT tag_id\n" +
+                "                FROM certificate_tag_mapping\n" +
+                "                INNER JOIN (SELECT certificate_id AS certId\n" +
+                "                        FROM certificate_order\n" +
+                "                        WHERE user_id = (SELECT us.user_id\n" +
+                "                        FROM (SELECT user_id, MAX(total) as total_spent\n" +
+                "                                FROM certificate_order\n" +
+                "                                GROUP BY user_id\n" +
+                "                                ORDER BY total_spent DESC\n" +
+                "                                LIMIT 1) us)) uc\n" +
+                "        ON uc.certId = certificate_id) ct\n" +
+                "        GROUP BY ct.tag_id\n" +
+                "        ORDER BY frequency DESC\n" +
+                "        LIMIT 1) tf ON tf.tagId = tag.id;";
+
+        try {
+            return Optional.ofNullable(jdbcOperations.query(query, rs -> {
+                if (rs.next()) {
+                    return mapTag(rs, 1);
+                }
+                return null;
+            }));
+        } catch (DataAccessException e) {
+            throw new DaoException("Unable to find most widely used tag", e);
+        }
+    }
+
     private Tag mapTag(ResultSet resultSet, int rowNum) throws SQLException {
         Tag tag = new Tag(resultSet.getString(TAG_NAME));
         tag.setId(resultSet.getInt(TAG_ID));

@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.repository.config.DaoConfig;
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.entity.GiftCertificate;
@@ -7,6 +8,7 @@ import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.exception.DaoException;
 import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.config.TestConfig;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.impl.InvalidRequestDataException;
@@ -36,7 +38,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
 public class GiftCertificateServiceImplTest {
 
     @Autowired

@@ -12,6 +12,7 @@ public class SqlQueryBuilder {
     private static final String UPDATE_STATEMENT = "UPDATE";
     private static final String ORDER_BY_STATEMENT = "ORDER BY";
     private static final String GROUP_BY_STATEMENT = "GROUP BY";
+    private static final String HAVING_STATEMENT = "HAVING";
     private static final String INNER_JOIN_STATEMENT = "INNER JOIN";
     private static final String LIMIT_STATEMENT = "LIMIT";
     private static final String OFFSET_STATEMENT = "OFFSET";
@@ -49,7 +50,7 @@ public class SqlQueryBuilder {
         return this;
     }
 
-    public SqlQueryBuilder addSelectClause(String tableName, String... columnNames) {
+    public SqlQueryBuilder addSelectClause(String source, String... columnNames) {
         queryBuilder.append(SELECT_STATEMENT)
                 .append(" ");
 
@@ -62,7 +63,7 @@ public class SqlQueryBuilder {
             }
         });
         queryBuilder.append("FROM ")
-                .append(tableName);
+                .append(source);
 
         return this;
     }
@@ -88,6 +89,15 @@ public class SqlQueryBuilder {
         return this;
     }
 
+    public SqlQueryBuilder addHavingClause(String condition) {
+        queryBuilder.append(" ")
+                .append(HAVING_STATEMENT)
+                .append(" ")
+                .append(condition);
+
+        return this;
+    }
+
     public SqlQueryBuilder addUpdateClause(String tableName, String... columnNames) {
         queryBuilder.append(UPDATE_STATEMENT)
                 .append(" ")
@@ -105,11 +115,11 @@ public class SqlQueryBuilder {
         return this;
     }
 
-    public SqlQueryBuilder addInnerJoinClause(String tableName, String condition) {
+    public SqlQueryBuilder addInnerJoinClause(String source, String condition) {
         queryBuilder.append(" ")
                 .append(INNER_JOIN_STATEMENT)
                 .append(" ")
-                .append(tableName)
+                .append(source)
                 .append(" ON ")
                 .append(condition);
 

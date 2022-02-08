@@ -16,4 +16,7 @@ public interface TagDao extends BaseDao<Tag> {
     List<Tag> getTags(int limit, int offset) throws DaoException;
 
     long getCount() throws DaoException;
+
+
+    Optional<Tag> findMostWidelyUsedTagOfUserWithHighestSpending() throws DaoException;
 }
