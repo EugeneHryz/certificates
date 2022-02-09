@@ -6,7 +6,10 @@ import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.web.controller.CertificateController;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.hateoas.CertificateModelAssembler;
+import com.epam.esm.web.model.hateoas.UserModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.PagedModelAssembler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -21,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftCertificateRequestModel> {
+
+    private final Logger logger = LoggerFactory.getLogger(PagedCertificateModelAssembler.class);
 
     private CertificateModelAssembler certificateAssembler;
 
@@ -38,8 +43,7 @@ public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftC
             pagedModel.add(links);
             return pagedModel;
         } catch (ServiceException | InvalidRequestDataException e) {
-            // ignore
-            e.printStackTrace();
+            logger.error("error while building pagination links for GiftCertificateRequestModel", e);
         }
         return pagedModel;
     }
@@ -52,7 +56,9 @@ public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftC
         return PagedModel.of(collectionModel, pageMetadata);
     }
 
-    private List<Link> createLinks(PagedModel.PageMetadata pageMetadata, CertificateSearchParameter options) throws ServiceException, InvalidRequestDataException {
+    private List<Link> createLinks(PagedModel.PageMetadata pageMetadata, CertificateSearchParameter options)
+            throws ServiceException, InvalidRequestDataException {
+
         int currentPage = (int)pageMetadata.getNumber();
         int pageSize = (int)pageMetadata.getSize();
         int totalPages = (int)pageMetadata.getTotalPages();

@@ -10,8 +10,11 @@ import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.hateoas.CertificateModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedCertificateModelAssembler;
+import com.epam.esm.web.model.hateoas.pagination.impl.PagedUserModelAssembler;
 import com.epam.esm.web.validator.CertificateModelValidator;
 import com.epam.esm.web.validator.TagModelValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.convert.ConversionService;
@@ -40,10 +43,8 @@ public class CertificateController {
     private ConversionService conversionService;
 
     @Autowired
-    public CertificateController(GiftCertificateService certService,
-                                 CertificateModelAssembler certificateAssembler,
-                                 PagedCertificateModelAssembler pagedAssembler,
-                                 ConversionService conversionService) {
+    public CertificateController(GiftCertificateService certService, CertificateModelAssembler certificateAssembler,
+                                 PagedCertificateModelAssembler pagedAssembler, ConversionService conversionService) {
         this.certificateService = certService;
         this.certificateAssembler = certificateAssembler;
         this.pagedCertificateAssembler = pagedAssembler;

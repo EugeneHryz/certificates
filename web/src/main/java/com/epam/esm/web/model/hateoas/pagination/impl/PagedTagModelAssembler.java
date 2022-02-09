@@ -6,6 +6,8 @@ import com.epam.esm.web.controller.TagController;
 import com.epam.esm.web.model.TagRequestModel;
 import com.epam.esm.web.model.hateoas.TagModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.PagedModelAssembler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class PagedTagModelAssembler implements PagedModelAssembler<TagRequestModel> {
+
+    private final Logger logger = LoggerFactory.getLogger(PagedTagModelAssembler.class);
 
     private TagModelAssembler tagAssembler;
 
@@ -35,8 +39,7 @@ public class PagedTagModelAssembler implements PagedModelAssembler<TagRequestMod
             return PagedModel.of(collectionModel, pageMetadata, links);
 
         } catch (ServiceException | InvalidRequestDataException e) {
-            // ignore
-            e.printStackTrace();
+            logger.error("error while building pagination links for TagRequestModel", e);
         }
         return PagedModel.of(collectionModel, pageMetadata);
     }

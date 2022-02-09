@@ -6,6 +6,8 @@ import com.epam.esm.web.controller.UserController;
 import com.epam.esm.web.model.UserRequestModel;
 import com.epam.esm.web.model.hateoas.UserModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.PagedModelAssembler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class PagedUserModelAssembler implements PagedModelAssembler<UserRequestModel> {
+
+    private final Logger logger = LoggerFactory.getLogger(PagedUserModelAssembler.class);
 
     private UserModelAssembler userAssembler;
 
@@ -37,8 +41,7 @@ public class PagedUserModelAssembler implements PagedModelAssembler<UserRequestM
             return PagedModel.of(collectionModel, pageMetadata, links);
 
         } catch (ServiceException | InvalidRequestDataException e) {
-            // ignore
-            e.printStackTrace();
+            logger.error("error while building pagination links for UserRequestModel", e);
         }
         return PagedModel.of(collectionModel, pageMetadata);
     }

@@ -4,11 +4,15 @@ import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.web.model.UserRequestModel;
 import com.epam.esm.service.dto.converter.AbstractTwoWayConverter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class UserModelConverter extends AbstractTwoWayConverter<UserRequestModel, UserDto> {
+
+    private final Logger logger = LoggerFactory.getLogger(UserModelConverter.class);
 
     @Override
     protected UserDto convertTo(UserRequestModel source) {
@@ -16,8 +20,7 @@ public class UserModelConverter extends AbstractTwoWayConverter<UserRequestModel
         try {
             BeanUtils.copyProperties(userDto, source);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            // ignore ?
-            e.printStackTrace();
+            logger.error("error while converting from UserRequestModel to UserDto", e);
         }
         return userDto;
     }
@@ -28,7 +31,7 @@ public class UserModelConverter extends AbstractTwoWayConverter<UserRequestModel
         try {
             BeanUtils.copyProperties(userModel, source);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error("error while converting from UserDto to UserRequestModel", e);
         }
         return userModel;
     }

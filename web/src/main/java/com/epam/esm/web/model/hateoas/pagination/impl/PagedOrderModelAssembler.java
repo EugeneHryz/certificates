@@ -7,6 +7,8 @@ import com.epam.esm.web.controller.UserController;
 import com.epam.esm.web.model.OrderRequestModel;
 import com.epam.esm.web.model.hateoas.OrderModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.PagedModelAssembler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class PagedOrderModelAssembler implements PagedModelAssembler<OrderRequestModel> {
+
+    private final Logger logger = LoggerFactory.getLogger(PagedOrderModelAssembler.class);
 
     private OrderModelAssembler orderAssembler;
 
@@ -38,8 +42,7 @@ public class PagedOrderModelAssembler implements PagedModelAssembler<OrderReques
             pagedModel.add(links);
             return pagedModel;
         } catch (ServiceException | InvalidRequestDataException | NoSuchElementException e) {
-            // ignore
-            e.printStackTrace();
+            logger.error("error while building pagination links for OrderRequestModel", e);
         }
         return pagedModel;
     }
