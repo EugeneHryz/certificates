@@ -1,0 +1,1 @@
+INSERT INTO Tag (name) VALUES ('THIS IS JUST A TEST');

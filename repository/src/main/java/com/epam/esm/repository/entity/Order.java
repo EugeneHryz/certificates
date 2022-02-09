@@ -1,39 +1,51 @@
 package com.epam.esm.repository.entity;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "certificate_order")
 public class Order extends AbstractEntity {
 
-    private int userId;
-    private int certificateId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "certificate_id", nullable = false)
+    private GiftCertificate certificate;
+
+    @Column(nullable = false)
     private double total;
+
+    @Column(updatable = false, nullable = false)
     private LocalDateTime purchaseDate;
 
     public Order() {
     }
 
-    public Order(int userId, int certificateId, double total, LocalDateTime purchaseDate) {
-        this.userId = userId;
-        this.certificateId = certificateId;
+    public Order(User user, GiftCertificate certificate, double total, LocalDateTime date) {
+        this.user = user;
+        this.certificate = certificate;
         this.total = total;
-        this.purchaseDate = purchaseDate;
+        this.purchaseDate = date;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public int getCertificateId() {
-        return certificateId;
+    public GiftCertificate getCertificate() {
+        return certificate;
     }
 
-    public void setCertificateId(int certificateId) {
-        this.certificateId = certificateId;
+    public void setCertificate(GiftCertificate certificate) {
+        this.certificate = certificate;
     }
 
     public double getTotal() {
@@ -57,13 +69,13 @@ public class Order extends AbstractEntity {
         if (this == o) return true;
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
-        return userId == order.userId && certificateId == order.certificateId
+        return user.equals(order.user) && certificate.equals(order.certificate)
                 && Double.compare(order.total, total) == 0 && getId() == order.getId()
                 && purchaseDate.isEqual(order.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), userId, certificateId, total, purchaseDate);
+        return Objects.hash(getId(), user, certificate, total, purchaseDate);
     }
 }

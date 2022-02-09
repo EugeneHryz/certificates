@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
 
+@Component
 public class OrderDtoConverter extends AbstractTwoWayConverter<OrderDto, Order> {
 
     private final Logger logger = LoggerFactory.getLogger(OrderDtoConverter.class);

@@ -20,7 +20,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import java.util.List;
 
 @Configuration
-@EnableTransactionManagement
 @ComponentScan({"com.epam.esm.web"})
 public class WebConfig extends WebMvcConfigurationSupport {
 

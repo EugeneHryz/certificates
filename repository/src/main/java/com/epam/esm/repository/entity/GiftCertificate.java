@@ -1,16 +1,40 @@
 package com.epam.esm.repository.entity;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "gift_certificate")
 public class GiftCertificate extends AbstractEntity {
 
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private double price;
+
+    @Column(nullable = false)
     private int duration;
+
+    @Column(nullable = false)
     private LocalDateTime created;
+
+    @Column(nullable = false)
     private LocalDateTime lastUpdated;
+
+    // cascade = CascadeType.PERSIST
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "certificate_tag_mapping",
+            joinColumns = @JoinColumn(name = "certificate_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
     public GiftCertificate() {
     }
@@ -71,6 +95,14 @@ public class GiftCertificate extends AbstractEntity {
 
     public void setLastUpdated(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override

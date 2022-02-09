@@ -71,6 +71,7 @@ public class CertificateController {
             throw new InvalidRequestDataException(errorMessage, GiftCertificateServiceImpl.CERTIFICATE_CODE);
         }
         GiftCertificateDto gcDto = conversionService.convert(gcRequestModel, GiftCertificateDto.class);
+
         GiftCertificateRequestModel certificateModel = conversionService.convert(
                 certificateService.createCertificate(gcDto), GiftCertificateRequestModel.class);
 

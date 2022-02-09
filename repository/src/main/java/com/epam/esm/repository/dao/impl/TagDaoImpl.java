@@ -3,94 +3,64 @@ package com.epam.esm.repository.dao.impl;
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import static com.epam.esm.repository.dao.query.DatabaseName.*;
-import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public class TagDaoImpl implements TagDao {
 
-    private JdbcOperations jdbcOperations;
-
-    @Autowired
-    public TagDaoImpl(JdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public int create(Tag entity) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addInsertClause(TAG_TABLE, TAG_NAME);
+        entityManager.persist(entity);
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        try {
-            jdbcOperations.update(connection -> {
-                PreparedStatement statement = connection.prepareStatement(queryBuilder.build(), Statement.RETURN_GENERATED_KEYS);
-                statement.setString(1, entity.getName());
-                return statement;
-            }, keyHolder);
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to create tag", e);
-        }
-
-        return keyHolder.getKey().intValue();
+        return entity.getId();
     }
 
     @Override
     public Optional<Tag> findById(int id) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(TAG_TABLE, TAG_ID, TAG_NAME)
-                .addWhereClause(TAG_ID + " = ?");
+        Tag tag = entityManager.find(Tag.class, id);
 
-        try {
-            return Optional.ofNullable(jdbcOperations.query(queryBuilder.build(), rs -> {
-                if (rs.next()) {
-                    return mapTag(rs, 1);
-                }
-                return null;
-            }, id));
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find tag by id (id = " + id + ")", e);
-        }
+        return Optional.ofNullable(tag);
     }
 
     @Override
     public List<Tag> getTags(int limit, int offset) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(TAG_TABLE, TAG_ID, TAG_NAME)
-                .addLimitAndOffset();
 
-        try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapTag, limit, offset);
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find all tags", e);
-        }
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
+
+        Root<Tag> tagRoot = criteriaQuery.from(Tag.class);
+        TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery.select(tagRoot));
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        return query.getResultList();
     }
 
     @Override
     public boolean deleteById(int id) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addDeleteClause(TAG_TABLE)
-                .addWhereClause(TAG_ID + " = ?");
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Tag> criteriaDelete = criteriaBuilder.createCriteriaDelete(Tag.class);
 
-        try {
-            return jdbcOperations.update(queryBuilder.build(), id) > 0;
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to delete tag (id = " + id + ")", e);
-        }
+        Root<Tag> rootTag = criteriaDelete.from(Tag.class);
+        criteriaDelete.where(criteriaBuilder.equal(rootTag.get(TAG_ID), id));
+
+        Query query = entityManager.createQuery(criteriaDelete);
+        return query.executeUpdate() > 0;
     }
 
     @Override
@@ -100,84 +70,29 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> findByName(String name) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(TAG_TABLE, TAG_ID, TAG_NAME)
-                .addWhereClause(TAG_NAME + " = ?");
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
 
-        try {
-            return Optional.ofNullable(jdbcOperations.query(queryBuilder.build(), rs -> {
-                if (rs.next()) {
-                    return mapTag(rs, 1);
-                }
-                return null;
-            }, name));
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find tag by name ( " + name + ")", e);
-        }
+        Root<Tag> rootTag = criteriaQuery.from(Tag.class);
+        criteriaQuery.select(rootTag).where(criteriaBuilder.equal(rootTag.get(TAG_NAME), name));
+        TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
+
+        return query.getResultStream().findFirst();
     }
 
     @Override
     public List<Tag> findTagsForCertificate(GiftCertificate cert) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(CT_MAPPING_TABLE, TAG_TABLE + "." + TAG_ID, TAG_NAME)
-                .addInnerJoinClause(TAG_TABLE, TAG_TABLE + "." + TAG_ID + " = " + CT_MAPPING_TAG_ID)
-                .addWhereClause(CT_MAPPING_CERTIFICATE_ID + " = ?");
-
-        try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapTag, cert.getId());
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find tags for certificate (id = " + cert.getId() + ")", e);
-        }
+        GiftCertificate certificate = entityManager.find(GiftCertificate.class, cert.getId());
+        return certificate.getTags();
     }
 
     @Override
     public long getCount() throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(TAG_TABLE, "COUNT(*)");
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
-        try {
-            Long count = jdbcOperations.queryForObject(queryBuilder.build(), (rs, rowNum) -> rs.getLong(1));
-            return count != null ? count : -1L;
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to get tag count", e);
-        }
-    }
-
-    @Override
-    public Optional<Tag> findMostWidelyUsedTagOfUserWithHighestSpending() throws DaoException {
-        String query = "SELECT tag.id, name\n" +
-                "        FROM tag\n" +
-                "        INNER JOIN (SELECT ct.tag_id as 'tagId', COUNT(*) AS frequency\n" +
-                "        FROM (SELECT tag_id\n" +
-                "                FROM certificate_tag_mapping\n" +
-                "                INNER JOIN (SELECT certificate_id AS certId\n" +
-                "                        FROM certificate_order\n" +
-                "                        WHERE user_id = (SELECT us.user_id\n" +
-                "                        FROM (SELECT user_id, MAX(total) as total_spent\n" +
-                "                                FROM certificate_order\n" +
-                "                                GROUP BY user_id\n" +
-                "                                ORDER BY total_spent DESC\n" +
-                "                                LIMIT 1) us)) uc\n" +
-                "        ON uc.certId = certificate_id) ct\n" +
-                "        GROUP BY ct.tag_id\n" +
-                "        ORDER BY frequency DESC\n" +
-                "        LIMIT 1) tf ON tf.tagId = tag.id;";
-
-        try {
-            return Optional.ofNullable(jdbcOperations.query(query, rs -> {
-                if (rs.next()) {
-                    return mapTag(rs, 1);
-                }
-                return null;
-            }));
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find most widely used tag", e);
-        }
-    }
-
-    private Tag mapTag(ResultSet resultSet, int rowNum) throws SQLException {
-        Tag tag = new Tag(resultSet.getString(TAG_NAME));
-        tag.setId(resultSet.getInt(TAG_ID));
-        return tag;
+        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Tag.class)));
+        TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
+        return query.getSingleResult();
     }
 }

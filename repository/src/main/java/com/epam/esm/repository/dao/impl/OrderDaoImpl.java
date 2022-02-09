@@ -2,99 +2,64 @@ package com.epam.esm.repository.dao.impl;
 
 import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.OrderDao;
-import com.epam.esm.repository.dao.query.SqlQueryBuilder;
 import com.epam.esm.repository.entity.Order;
 import com.epam.esm.repository.exception.DaoException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
 
-    private JdbcOperations jdbcOperations;
-
-    @Autowired
-    public OrderDaoImpl(JdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public int create(Order entity) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addInsertClause(ORDER_TABLE, ORDER_USER_ID, ORDER_CERTIFICATE_ID, ORDER_TOTAL, ORDER_PURCHASE_DATE);
+        entityManager.persist(entity);
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        try {
-            jdbcOperations.update(connection -> {
-                PreparedStatement statement = connection.prepareStatement(queryBuilder.build(), Statement.RETURN_GENERATED_KEYS);
-                statement.setInt(1, entity.getUserId());
-                statement.setInt(2, entity.getCertificateId());
-                statement.setDouble(3, entity.getTotal());
-                statement.setTimestamp(4, Timestamp.valueOf(entity.getPurchaseDate()));
-                return statement;
-            }, keyHolder);
-
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to create order", e);
-        }
-        return keyHolder.getKey().intValue();
+        return entity.getId();
     }
 
     @Override
     public List<Order> getUserOrders(int userId, int limit, int offset) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(ORDER_TABLE, ORDER_ID, ORDER_USER_ID, ORDER_CERTIFICATE_ID,
-                ORDER_TOTAL, ORDER_PURCHASE_DATE)
-                .addWhereClause(ORDER_USER_ID + " = ?")
-                .addLimitAndOffset();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
 
-        try {
-            return jdbcOperations.query(queryBuilder.build(), this::mapOrder, userId, limit, offset);
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to get user orders (userId = " + userId + ")", e);
-        }
+        Root<Order> orderRoot = criteriaQuery.from(Order.class);
+        criteriaQuery.select(orderRoot).where(criteriaBuilder.equal(orderRoot.get("user").get(USER_ID), userId));
+        TypedQuery<Order> query = entityManager.createQuery(criteriaQuery);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        return query.getResultList();
     }
 
     @Override
     public Optional<Order> findById(int id) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(ORDER_TABLE, ORDER_ID, ORDER_USER_ID, ORDER_CERTIFICATE_ID,
-                        ORDER_TOTAL, ORDER_PURCHASE_DATE)
-                .addWhereClause(ORDER_ID + " = ?");
+        Order order = entityManager.find(Order.class, id);
 
-        try {
-            return Optional.ofNullable(jdbcOperations.query(queryBuilder.build(), rs -> {
-                if (rs.next()) {
-                    return mapOrder(rs, 1);
-                }
-                return null;
-            }, id));
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to find order (id = " + id + ")", e);
-        }
+        return Optional.ofNullable(order);
     }
 
     @Override
     public long getUserOrderCount(int userId) throws DaoException {
-        SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
-        queryBuilder.addSelectClause(ORDER_TABLE, "COUNT(*)")
-                .addWhereClause(ORDER_USER_ID + " = ?");
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
-        try {
-            Long count = jdbcOperations.queryForObject(queryBuilder.build(),
-                    (rs, rowNum) -> rs.getLong(1), userId);
-            return count != null ? count : -1L;
-        } catch (DataAccessException e) {
-            throw new DaoException("Unable to get user order count (userId = " + userId + ")", e);
-        }
+        Root<Order> orderRoot = criteriaQuery.from(Order.class);
+        criteriaQuery.select(criteriaBuilder.count(orderRoot));
+        criteriaQuery.where(criteriaBuilder.equal(orderRoot.get("user").get(USER_ID), userId));
+        TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
+
+        return query.getSingleResult();
     }
 
     @Override
@@ -105,15 +70,5 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Optional<Order> update(Order entity) throws DaoException {
         throw new UnsupportedOperationException();
-    }
-
-    private Order mapOrder(ResultSet rs, int rowNum) throws SQLException {
-        Order order = new Order();
-        order.setId(rs.getInt(ORDER_ID));
-        order.setUserId(rs.getInt(ORDER_USER_ID));
-        order.setCertificateId(rs.getInt(ORDER_CERTIFICATE_ID));
-        order.setTotal(rs.getDouble(ORDER_TOTAL));
-        order.setPurchaseDate(rs.getTimestamp(ORDER_PURCHASE_DATE).toLocalDateTime());
-        return order;
     }
 }

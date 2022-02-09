@@ -11,7 +11,7 @@ public interface GiftCertificateDao extends BaseDao<GiftCertificate> {
 
     List<GiftCertificate> findCertificates(CertificateSearchParameter options, int limit, int offset) throws DaoException;
 
-    boolean createCertificateTagMapping(int certId, int tagId) throws DaoException;
+//    boolean createCertificateTagMapping(int certId, int tagId) throws DaoException;
 
     Optional<GiftCertificate> findByName(String name) throws DaoException;
 
