@@ -16,12 +16,12 @@ public class TagModelValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        ValidationUtils.rejectIfEmpty(errors, "name", "name cannot be null");
+        ValidationUtils.rejectIfEmpty(errors, "name", "tag name cannot be null");
         TagRequestModel tagModel = (TagRequestModel) target;
 
         String name = tagModel.getName();
         if (name.length() < 3 || name.length() > 100) {
-            errors.rejectValue("name", "name must be between 3 and 100 characters long");
+            errors.rejectValue("name", "tag name must be between 3 and 100 characters long");
         }
     }
 }

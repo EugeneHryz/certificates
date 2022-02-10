@@ -1,5 +1,7 @@
 package com.epam.esm.repository.entity;
 
+import com.epam.esm.repository.entity.listener.AuditEntityListener;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,6 +9,18 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "gift_certificate")
+@EntityListeners(AuditEntityListener.class)
+//@NamedNativeQuery(name = "findCertificates",
+//        query = "SELECT *\n" +
+//                "FROM gift_certificate\n" +
+//                "         INNER JOIN (SELECT certificate_id\n" +
+//                "                     FROM certificate_tag_mapping\n" +
+//                "                     WHERE tag_id IN (SELECT id FROM tag WHERE name = 'fun' OR name = 'amusement park')\n" +
+//                "                     GROUP BY certificate_id\n" +
+//                "                     HAVING COUNT(*) = 2) mc\n" +
+//                "                    ON mc.certificate_id = id\n" +
+//                "WHERE (name LIKE '%%' OR description LIKE '%%')\n" +
+//                "ORDER BY last_update_date DESC;")
 public class GiftCertificate extends AbstractEntity {
 
     @Column(nullable = false, unique = true)
@@ -24,15 +38,15 @@ public class GiftCertificate extends AbstractEntity {
     @Column(nullable = false)
     private LocalDateTime created;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "last_updated")
     private LocalDateTime lastUpdated;
 
-    // cascade = CascadeType.PERSIST
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "certificate_tag_mapping",
             joinColumns = @JoinColumn(name = "certificate_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
+            inverseJoinColumns = @JoinColumn(name = "tag_id",
+            unique = true)
     )
     private List<Tag> tags;
 
@@ -119,5 +133,19 @@ public class GiftCertificate extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), name, description, price, duration, created, lastUpdated);
+    }
+
+    @Override
+    public String toString() {
+        return "GiftCertificate{" +
+                "id=" + getId() +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", duration=" + duration +
+                ", created=" + created +
+                ", lastUpdated=" + lastUpdated +
+                ", tags=" + tags +
+                '}';
     }
 }

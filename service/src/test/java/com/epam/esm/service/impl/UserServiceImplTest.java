@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.repository.config.DaoConfig;
+import com.epam.esm.repository.config.PersistenceConfig;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.anyInt;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
+@SpringBootTest(classes = {PersistenceConfig.class, TestConfig.class})
 public class UserServiceImplTest {
 
     @Autowired

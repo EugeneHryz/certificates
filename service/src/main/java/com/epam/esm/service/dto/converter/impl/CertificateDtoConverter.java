@@ -23,19 +23,18 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
         try {
             BeanUtils.copyProperties(certificate, source);
 
-//            if (source.getTags() != null) {
-//                List<Tag> tags = source.getTags().stream().map(t -> {
-//                    Tag tag = new Tag();
-//                    try {
-//                        BeanUtils.copyProperties(tag, t);
-//                    } catch (IllegalAccessException | InvocationTargetException e) {
-//                        // ignore ?
-//                        e.printStackTrace();
-//                    }
-//                    return tag;
-//                }).collect(Collectors.toList());
-//                certificate.setTags(tags);
-//            }
+            if (source.getTags() != null) {
+                List<Tag> tags = source.getTags().stream().map(t -> {
+                    Tag tag = new Tag();
+                    try {
+                        BeanUtils.copyProperties(tag, t);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        logger.error("error while converting from TagDto to Tag", e);
+                    }
+                    return tag;
+                }).collect(Collectors.toList());
+                certificate.setTags(tags);
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("error while converting from GiftCertificateDto to GiftCertificate", e);
         }
@@ -48,19 +47,18 @@ public class CertificateDtoConverter extends AbstractTwoWayConverter<GiftCertifi
         try {
             BeanUtils.copyProperties(certificateDto, source);
 
-//            if (source.getTags() != null) {
-//                List<TagDto> tagsDto = source.getTags().stream().map(t -> {
-//                    TagDto tagDto = new TagDto();
-//                    try {
-//                        BeanUtils.copyProperties(tagDto, t);
-//                    } catch (IllegalAccessException | InvocationTargetException e) {
-//                        // ignore ?
-//                        e.printStackTrace();
-//                    }
-//                    return tagDto;
-//                }).collect(Collectors.toList());
-//                certificateDto.setTags(tagsDto);
-//            }
+            if (source.getTags() != null) {
+                List<TagDto> tagsDto = source.getTags().stream().map(t -> {
+                    TagDto tagDto = new TagDto();
+                    try {
+                        BeanUtils.copyProperties(tagDto, t);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        logger.error("error while converting from Tag to TagDto", e);
+                    }
+                    return tagDto;
+                }).collect(Collectors.toList());
+                certificateDto.setTags(tagsDto);
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("error while converting from GiftCertificate to GiftCertificateDto", e);
         }

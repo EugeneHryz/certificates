@@ -1,11 +1,14 @@
 package com.epam.esm.repository.entity;
 
+import com.epam.esm.repository.entity.listener.AuditEntityListener;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "certificate_order")
+@EntityListeners(AuditEntityListener.class)
 public class Order extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -19,7 +22,7 @@ public class Order extends AbstractEntity {
     @Column(nullable = false)
     private double total;
 
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false, name = "purchase_date")
     private LocalDateTime purchaseDate;
 
     public Order() {
@@ -77,5 +80,16 @@ public class Order extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), user, certificate, total, purchaseDate);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + getId() +
+                "user=" + user +
+                ", certificate=" + certificate +
+                ", total=" + total +
+                ", purchaseDate=" + purchaseDate +
+                '}';
     }
 }

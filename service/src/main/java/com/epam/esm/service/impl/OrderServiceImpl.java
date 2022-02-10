@@ -55,6 +55,9 @@ public class OrderServiceImpl implements OrderService {
             LocalDateTime purchaseDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             Order order = conversionService.convert(orderDto, Order.class);
             order.setPurchaseDate(purchaseDate);
+            order.setUser(user.get());
+            order.setTotal(certificate.get().getPrice());
+            order.setCertificate(certificate.get());
 
             int generatedId = orderDao.create(order);
             order.setId(generatedId);

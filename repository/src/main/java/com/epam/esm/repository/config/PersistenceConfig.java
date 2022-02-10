@@ -1,7 +1,10 @@
 package com.epam.esm.repository.config;
 
+import com.epam.esm.repository.entity.listener.BeanUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +26,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("com.epam.esm.repository.dao")
+@ComponentScan(basePackages = {"com.epam.esm.repository.dao"})
 @EnableTransactionManagement
 @PropertySource("classpath:db.properties")
 public class PersistenceConfig {
@@ -61,11 +64,6 @@ public class PersistenceConfig {
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
-
-    @Bean
     public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
     }
@@ -82,6 +80,13 @@ public class PersistenceConfig {
         dataSource.setMaxTotal(Integer.parseInt(env.getProperty("maxTotal")));
 
         return dataSource;
+    }
+
+    @Bean
+    public BeanUtil beanUtil(ApplicationContext applicationContext) {
+        BeanUtil beanUtil = new BeanUtil();
+        beanUtil.setApplicationContext(applicationContext);
+        return beanUtil;
     }
 
     private Properties getAdditionalProperties() {

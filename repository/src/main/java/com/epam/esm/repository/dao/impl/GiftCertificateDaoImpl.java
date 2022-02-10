@@ -17,7 +17,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 @Transactional
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
@@ -53,29 +52,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findCertificates(CertificateSearchParameter options, int limit, int offset) throws DaoException {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
 
-        Metamodel metamodel = entityManager.getMetamodel();
-        EntityType<GiftCertificate> Certificate_ = metamodel.entity(GiftCertificate.class);
-        EntityType<Tag> Tag_ = metamodel.entity(Tag.class);
-
-        Root<GiftCertificate> rootCert = criteriaQuery.from(GiftCertificate.class);
-//        ListJoin<GiftCertificate, Tag> tags = rootCert.join(Certificate_.getList("tags", Tag.class));
-//        // todo: list check
-//        Predicate[] tagPredicates =  Arrays.stream(options.getTagNames()).map(tagName ->
-//                criteriaBuilder.equal(tags.get(Tag_.getSingularAttribute("name")),
-//                        tagName)).toArray(Predicate[]::new);
-        System.out.println("searchParam: " + options.getSearchParam());
-        Predicate searchPredicate =  criteriaBuilder.like(rootCert.get("name"), options.getSearchParam());
-
-        criteriaQuery.select(rootCert);
-        criteriaQuery.where(searchPredicate);
-        TypedQuery<GiftCertificate> query = entityManager.createQuery(criteriaQuery);
-        query.setFirstResult(offset);
-        query.setMaxResults(limit);
-
-        return query.getResultList();
     }
 
     @Override
@@ -106,26 +83,35 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long getCount(CertificateSearchParameter options) throws DaoException {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
-
-        Metamodel metamodel = entityManager.getMetamodel();
-        EntityType<GiftCertificate> Certificate_ = metamodel.entity(GiftCertificate.class);
-        EntityType<Tag> Tag_ = metamodel.entity(Tag.class);
-
-        Root<GiftCertificate> rootCert = criteriaQuery.from(GiftCertificate.class);
-//        ListJoin<GiftCertificate, Tag> tags = rootCert.join(Certificate_.getList("tags", Tag.class));
-//        // todo: list check
-//        Predicate[] tagPredicates = Arrays.stream(options.getTagNames()).map(tagName ->
-//                criteriaBuilder.equal(tags.get(Tag_.getSingularAttribute("name")),
-//                tagName)).toArray(Predicate[]::new);
-
-        System.out.println("searchParam: " + options.getSearchParam());
-        Predicate searchPredicate =  criteriaBuilder.like(rootCert.get("name"), options.getSearchParam());
-
-        criteriaQuery.select(criteriaBuilder.count(rootCert));
-        criteriaQuery.where(searchPredicate);
-        TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
-        return query.getSingleResult();
+//        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Long> mainQuery = criteriaBuilder.createQuery(Long.class);
+//        Subquery<Integer> subquery = mainQuery.subquery(Integer.class);
+//
+//        Metamodel metamodel = entityManager.getMetamodel();
+//        EntityType<GiftCertificate> Certificate_ = metamodel.entity(GiftCertificate.class);
+//
+//        Root<GiftCertificate> rootCert = subquery.from(GiftCertificate.class);
+//        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+//            ListJoin<GiftCertificate, Tag> certTags = rootCert.join(Certificate_.getList("tags", Tag.class));
+//
+//            subquery.where(certTags.get("name").in((Object[]) options.getTagNames()));
+//            subquery.groupBy(rootCert.get("id"));
+//            subquery.having(criteriaBuilder.and(criteriaBuilder.equal(criteriaBuilder.count(certTags.get("id")),
+//                    options.getTagNames().length)));
+//        }
+//        subquery.select(rootCert.get("id"));
+//
+//        Root<GiftCertificate> mainRoot = mainQuery.from(GiftCertificate.class);
+//        String searchPattern = "%" + options.getSearchParam() + "%";
+//        Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get("name"), searchPattern),
+//                criteriaBuilder.like(mainRoot.get("description"), searchPattern));
+//        mainQuery.select(criteriaBuilder.count(mainRoot));
+//        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+//            mainQuery.where(criteriaBuilder.and(mainRoot.get("id").in(subquery), searchPredicate));
+//        } else {
+//            mainQuery.where(searchPredicate);
+//        }
+//
+//        return entityManager.createQuery(mainQuery).getSingleResult();
     }
 }

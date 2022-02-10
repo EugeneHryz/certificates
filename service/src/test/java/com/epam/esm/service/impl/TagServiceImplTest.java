@@ -1,6 +1,6 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.repository.config.DaoConfig;
+import com.epam.esm.repository.config.PersistenceConfig;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.Tag;
@@ -32,7 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DaoConfig.class, TestConfig.class})
+@SpringBootTest(classes = {PersistenceConfig.class, TestConfig.class})
 public class TagServiceImplTest {
 
     @Autowired

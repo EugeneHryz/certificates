@@ -5,6 +5,8 @@ import com.epam.esm.repository.entity.Tag;
 import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.exception.DaoException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
@@ -18,10 +20,14 @@ import java.util.Optional;
 
 @Repository
 @Transactional
+@PropertySource("classpath:query.properties")
 public class TagDaoImpl implements TagDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+//    @Value("${dao.findTagOfUserWithHighestSpending}")
+//    private String findTagOfUserWithHighestSpending;
 
     @Override
     public int create(Tag entity) throws DaoException {
@@ -94,5 +100,16 @@ public class TagDaoImpl implements TagDao {
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Tag.class)));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
         return query.getSingleResult();
+    }
+
+    @Override
+    public Optional<Tag> findMostWidelyUsedTagOfUserWithHighestSpending() throws DaoException {
+        Query query = entityManager.createNamedQuery("findWidelyUsedTagOfUserWithHighestSpending");
+
+        try {
+            return Optional.of((Tag) query.getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 }

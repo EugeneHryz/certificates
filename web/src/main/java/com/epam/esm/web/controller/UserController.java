@@ -1,8 +1,12 @@
 package com.epam.esm.web.controller;
 
+import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.service.TagService;
 import com.epam.esm.service.UserService;
+import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.OrderDto;
+import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.service.impl.OrderServiceImpl;
 import com.epam.esm.web.model.hateoas.OrderModelAssembler;
@@ -16,6 +20,8 @@ import com.epam.esm.web.model.hateoas.pagination.impl.PagedOrderModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedUserModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
@@ -23,8 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -116,6 +125,7 @@ public class UserController {
         return orderAssembler.toModel(orderRequestModel);
     }
 
+    // todo:!!
     private String extractValidationErrorMessage(BindingResult bindingResult) {
         Optional<String> message = bindingResult.getAllErrors().stream()
                 .map(error -> error.getDefaultMessage()).findFirst();

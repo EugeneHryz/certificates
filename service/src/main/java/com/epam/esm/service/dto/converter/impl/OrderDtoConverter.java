@@ -31,6 +31,10 @@ public class OrderDtoConverter extends AbstractTwoWayConverter<OrderDto, Order> 
         OrderDto orderDto = new OrderDto();
         try {
             BeanUtils.copyProperties(orderDto, source);
+
+            orderDto.setCertificateId(source.getCertificate().getId());
+            orderDto.setUserId(source.getUser().getId());
+
         } catch (IllegalAccessException | InvocationTargetException e) {
             logger.error("error while converting from Order to OrderDto", e);
         }
