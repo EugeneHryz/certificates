@@ -54,7 +54,7 @@ public class TagServiceImplTest {
         tag.setId(20);
 
         Mockito.when(tagDao.findById(anyInt())).thenReturn(Optional.of(tag));
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         TagDto expected = conversionService.convert(tag, TagDto.class);
         TagDto actual = tagService.getTag(20);
@@ -64,7 +64,7 @@ public class TagServiceImplTest {
     @Test
     public void getTagShouldThrowNoSuchElementException() throws DaoException {
         Mockito.when(tagDao.findById(anyInt())).thenReturn(Optional.empty());
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(NoSuchElementException.class, () -> tagService.getTag(15));
     }
@@ -72,7 +72,7 @@ public class TagServiceImplTest {
     @Test
     public void getTagShouldThrowServiceException() throws DaoException {
         Mockito.when(tagDao.findById(anyInt())).thenThrow(DaoException.class);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, () -> tagService.getTag(15));
     }
@@ -89,7 +89,7 @@ public class TagServiceImplTest {
         tags.add(tag2);
 
         Mockito.when(tagDao.getTags(2, 0)).thenReturn(tags);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         List<TagDto> expected = tags.stream().map(t -> conversionService.convert(t, TagDto.class))
                 .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class TagServiceImplTest {
     @Test
     public void getAllTagsShouldThrowServiceException() throws DaoException {
         Mockito.when(tagDao.getTags(5, 0)).thenThrow(DaoException.class);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, () -> tagService.getTags(0, 5));
     }
@@ -109,7 +109,7 @@ public class TagServiceImplTest {
     public void createTagShouldBeCorrect() throws DaoException, ServiceException {
         Mockito.when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
         Mockito.when(tagDao.create(any())).thenReturn(23);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         TagDto expected = new TagDto("holidays");
         expected.setId(23);
@@ -123,7 +123,7 @@ public class TagServiceImplTest {
         tag.setId(13);
 
         Mockito.when(tagDao.findByName("bike ride")).thenReturn(Optional.of(tag));
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, () -> tagService
                 .createTag(conversionService.convert(tag, TagDto.class)));
@@ -133,7 +133,7 @@ public class TagServiceImplTest {
     public void createTagShouldThrowServiceException() throws DaoException {
         Mockito.when(tagDao.findByName(anyString())).thenReturn(Optional.empty());
         Mockito.when(tagDao.create(any())).thenThrow(DaoException.class);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, () -> tagService
                 .createTag(new TagDto("wowowo")));
@@ -142,7 +142,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteTagShouldBeCorrect() throws DaoException, ServiceException, NoSuchElementException {
         Mockito.when(tagDao.deleteById(anyInt())).thenReturn(true);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         tagService.deleteTag(4);
         Mockito.verify(tagDao, times(1)).deleteById(4);
@@ -151,7 +151,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteTagTShouldThrowNoSuchElementException() throws DaoException {
         Mockito.when(tagDao.deleteById(anyInt())).thenReturn(false);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(NoSuchElementException.class, () -> tagService.deleteTag(10));
     }
@@ -159,7 +159,7 @@ public class TagServiceImplTest {
     @Test
     public void deleteTagShouldThrowServiceException() throws DaoException {
         Mockito.when(tagDao.deleteById(anyInt())).thenThrow(DaoException.class);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, () -> tagService.deleteTag(10));
     }
@@ -167,7 +167,7 @@ public class TagServiceImplTest {
     @Test
     public void getTagCountShouldBeCorrect() throws DaoException, ServiceException {
         Mockito.when(tagDao.getCount()).thenReturn(54L);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         long expected = 54;
         long actual = tagService.getTagCount();
@@ -177,7 +177,7 @@ public class TagServiceImplTest {
     @Test
     public void getTagCountShouldThrowException() throws DaoException {
         Mockito.when(tagDao.getCount()).thenThrow(DaoException.class);
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         Assertions.assertThrows(ServiceException.class, tagService::getTagCount);
     }
@@ -188,7 +188,7 @@ public class TagServiceImplTest {
         tag.setId(11);
 
         Mockito.when(tagDao.findMostWidelyUsedTagOfUserWithHighestSpending()).thenReturn(Optional.of(tag));
-        TagService tagService = new TagServiceImpl(tagDao, userDao, conversionService);
+        TagService tagService = new TagServiceImpl(tagDao, conversionService);
 
         TagDto expected = new TagDto("flight to Philippines for 10 days");
         expected.setId(11);

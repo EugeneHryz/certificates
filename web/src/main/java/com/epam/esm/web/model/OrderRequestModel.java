@@ -1,21 +1,21 @@
 package com.epam.esm.web.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class OrderRequestModel {
 
-    // todo: validate these fields
     private int id;
     private int userId;
     private int certificateId;
-    private double total;
+    private BigDecimal total;
     private LocalDateTime purchaseDate;
 
     public OrderRequestModel() {
     }
 
-    public OrderRequestModel(int id, int userId, int certificateId, double total, LocalDateTime date) {
+    public OrderRequestModel(int id, int userId, int certificateId, BigDecimal total, LocalDateTime date) {
         this.id = id;
         this.userId = userId;
         this.certificateId = certificateId;
@@ -47,11 +47,11 @@ public class OrderRequestModel {
         this.certificateId = certificateId;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
@@ -69,7 +69,7 @@ public class OrderRequestModel {
         if (!(o instanceof OrderRequestModel)) return false;
         OrderRequestModel that = (OrderRequestModel) o;
         return id == that.id && userId == that.userId && certificateId == that.certificateId
-                && Double.compare(that.total, total) == 0 && Objects.equals(purchaseDate, that.purchaseDate);
+                && total.compareTo(that.total) == 0 && Objects.equals(purchaseDate, that.purchaseDate);
     }
 
     @Override

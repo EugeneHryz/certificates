@@ -27,7 +27,7 @@ public class UserModelAssembler implements RepresentationModelAssembler<UserRequ
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                             .getUserOrders(0, 2, entity.getId())).withRel("userOrders"));
 
-        } catch (ServiceException | NoSuchElementException | InvalidRequestDataException e) {
+        } catch (ServiceException | NoSuchElementException e) {
             logger.error("error while building links for UserRequestModel", e);
         }
         return EntityModel.of(entity);

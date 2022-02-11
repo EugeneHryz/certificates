@@ -9,7 +9,6 @@ import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.web.model.TagRequestModel;
 import com.epam.esm.web.model.hateoas.TagModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedTagModelAssembler;
-import com.epam.esm.web.validator.CertificateModelValidator;
 import com.epam.esm.web.validator.TagModelValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
@@ -54,8 +53,8 @@ public class TagController {
     /**
      * create new tag
      *
-     * @param
-     * @return created TagDto if successful
+     * @param tagRequestModel tag to create
+     * @return created tag representation if successful
      * @throws ServiceException if an error occurs
      */
     @PostMapping(consumes = "application/json")
@@ -78,7 +77,7 @@ public class TagController {
      * get tag by id
      *
      * @param id tag id
-     * @return TagDto
+     * @return tag representation
      * @throws NoSuchElementException if there's no such tag with specified id
      * @throws ServiceException if an error occurs
      */
@@ -88,6 +87,14 @@ public class TagController {
         return tagAssembler.toModel(tagRequestModel);
     }
 
+    /**
+     * get paged tags
+     *
+     * @param page page number
+     * @param size number of elements on one page
+     * @return paged list of tag representations with links to navigate through the pages
+     * @throws ServiceException if an error occurs
+     */
     @GetMapping(produces = {"application/json"})
     public PagedModel<EntityModel<TagRequestModel>> getTags(@RequestParam(value = "page", defaultValue = "0") int page,
                               @RequestParam(value = "size", defaultValue = "2") int size)
@@ -106,7 +113,7 @@ public class TagController {
      * delete tag by id
      *
      * @param id tag id
-     * @return deleted tag id, if successful
+     * @return no content response if successful
      * @throws ServiceException if an error occurs
      * @throws NoSuchElementException if there's no such tag with specified id
      */
@@ -117,6 +124,13 @@ public class TagController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * find most widely used tag of a user with the highest spending
+     *
+     * @return tag representation
+     * @throws ServiceException if an error occurs
+     * @throws NoSuchElementException if tag is not found
+     */
     @GetMapping(value = "/widelyUsedTag", produces = {"application/json"})
     public EntityModel<TagRequestModel> getMostWidelyUsedTagOfUserWithMostSpending()
             throws ServiceException, NoSuchElementException {

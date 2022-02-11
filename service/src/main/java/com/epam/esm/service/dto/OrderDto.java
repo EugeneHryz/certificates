@@ -1,5 +1,6 @@
 package com.epam.esm.service.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -7,13 +8,13 @@ public class OrderDto extends AbstractDto {
 
     private int userId;
     private int certificateId;
-    private double total;
+    private BigDecimal total;
     private LocalDateTime purchaseDate;
 
     public OrderDto() {
     }
 
-    public OrderDto(int userId, int certificateId, double total, LocalDateTime date) {
+    public OrderDto(int userId, int certificateId, BigDecimal total, LocalDateTime date) {
         this.userId = userId;
         this.certificateId = certificateId;
         this.total = total;
@@ -36,11 +37,11 @@ public class OrderDto extends AbstractDto {
         this.certificateId = certificateId;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
@@ -58,7 +59,7 @@ public class OrderDto extends AbstractDto {
         if (!(o instanceof OrderDto)) return false;
         OrderDto orderDto = (OrderDto) o;
         return getId() == orderDto.getId() && userId == orderDto.userId && certificateId == orderDto.certificateId
-                && Double.compare(orderDto.total, total) == 0 && Objects.equals(purchaseDate, orderDto.purchaseDate);
+                && total.compareTo(orderDto.total) == 0 && Objects.equals(purchaseDate, orderDto.purchaseDate);
     }
 
     @Override

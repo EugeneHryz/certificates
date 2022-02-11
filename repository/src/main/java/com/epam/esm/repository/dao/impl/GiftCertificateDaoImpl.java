@@ -1,9 +1,10 @@
 package com.epam.esm.repository.dao.impl;
 
+import com.epam.esm.repository.entity.GiftCertificate_;
 import com.epam.esm.repository.entity.Tag;
+import com.epam.esm.repository.entity.Tag_;
 import com.epam.esm.repository.searchoption.CertificateSearchParameter;
 import com.epam.esm.repository.entity.GiftCertificate;
-import static com.epam.esm.repository.dao.query.DatabaseName.*;
 
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.exception.DaoException;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         CriteriaQuery<GiftCertificate> criteriaQuery = criteriaBuilder.createQuery(GiftCertificate.class);
 
         Root<GiftCertificate> rootCert = criteriaQuery.from(GiftCertificate.class);
-        criteriaQuery.select(rootCert).where(criteriaBuilder.equal(rootCert.get(CERTIFICATE_NAME), name));
+        criteriaQuery.select(rootCert).where(criteriaBuilder.equal(rootCert.get(GiftCertificate_.name), name));
         TypedQuery<GiftCertificate> query = entityManager.createQuery(criteriaQuery);
 
         return query.getResultStream().findFirst();
@@ -53,6 +52,36 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public List<GiftCertificate> findCertificates(CertificateSearchParameter options, int limit, int offset) throws DaoException {
 
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GiftCertificate> mainQuery = criteriaBuilder.createQuery(GiftCertificate.class);
+        Subquery<Integer> subquery = mainQuery.subquery(Integer.class);
+
+        Root<GiftCertificate> rootCert = subquery.from(GiftCertificate.class);
+        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+            ListJoin<GiftCertificate, Tag> certTags = rootCert.join(GiftCertificate_.tags);
+
+            subquery.where(certTags.get(Tag_.name).in((Object[]) options.getTagNames()));
+            subquery.groupBy(rootCert.get(GiftCertificate_.id));
+            subquery.having(criteriaBuilder.and(criteriaBuilder.equal(criteriaBuilder.count(certTags
+                            .get(GiftCertificate_.id)), options.getTagNames().length)));
+        }
+        subquery.select(rootCert.get(GiftCertificate_.id));
+
+        Root<GiftCertificate> mainRoot = mainQuery.from(GiftCertificate.class);
+        String searchPattern = "%" + options.getSearchParam() + "%";
+        Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get(GiftCertificate_.name), searchPattern),
+                criteriaBuilder.like(mainRoot.get(GiftCertificate_.description), searchPattern));
+        mainQuery.select(mainRoot);
+        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+            mainQuery.where(criteriaBuilder.and(mainRoot.get(GiftCertificate_.id).in(subquery), searchPredicate));
+        } else {
+            mainQuery.where(searchPredicate);
+        }
+        TypedQuery<GiftCertificate> query = entityManager.createQuery(mainQuery);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+
+        return query.getResultList();
     }
 
     @Override
@@ -61,7 +90,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         CriteriaDelete<GiftCertificate> criteriaDelete = criteriaBuilder.createCriteriaDelete(GiftCertificate.class);
 
         Root<GiftCertificate> rootCert = criteriaDelete.from(GiftCertificate.class);
-        criteriaDelete.where(criteriaBuilder.equal(rootCert.get(CERTIFICATE_ID), id));
+        criteriaDelete.where(criteriaBuilder.equal(rootCert.get(GiftCertificate_.id), id));
 
         Query query = entityManager.createQuery(criteriaDelete);
         return query.executeUpdate() > 0;
@@ -83,35 +112,33 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public long getCount(CertificateSearchParameter options) throws DaoException {
-//        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-//        CriteriaQuery<Long> mainQuery = criteriaBuilder.createQuery(Long.class);
-//        Subquery<Integer> subquery = mainQuery.subquery(Integer.class);
-//
-//        Metamodel metamodel = entityManager.getMetamodel();
-//        EntityType<GiftCertificate> Certificate_ = metamodel.entity(GiftCertificate.class);
-//
-//        Root<GiftCertificate> rootCert = subquery.from(GiftCertificate.class);
-//        if (options.getTagNames() != null && options.getTagNames().length > 0) {
-//            ListJoin<GiftCertificate, Tag> certTags = rootCert.join(Certificate_.getList("tags", Tag.class));
-//
-//            subquery.where(certTags.get("name").in((Object[]) options.getTagNames()));
-//            subquery.groupBy(rootCert.get("id"));
-//            subquery.having(criteriaBuilder.and(criteriaBuilder.equal(criteriaBuilder.count(certTags.get("id")),
-//                    options.getTagNames().length)));
-//        }
-//        subquery.select(rootCert.get("id"));
-//
-//        Root<GiftCertificate> mainRoot = mainQuery.from(GiftCertificate.class);
-//        String searchPattern = "%" + options.getSearchParam() + "%";
-//        Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get("name"), searchPattern),
-//                criteriaBuilder.like(mainRoot.get("description"), searchPattern));
-//        mainQuery.select(criteriaBuilder.count(mainRoot));
-//        if (options.getTagNames() != null && options.getTagNames().length > 0) {
-//            mainQuery.where(criteriaBuilder.and(mainRoot.get("id").in(subquery), searchPredicate));
-//        } else {
-//            mainQuery.where(searchPredicate);
-//        }
-//
-//        return entityManager.createQuery(mainQuery).getSingleResult();
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> mainQuery = criteriaBuilder.createQuery(Long.class);
+        Subquery<Integer> subquery = mainQuery.subquery(Integer.class);
+
+        Root<GiftCertificate> rootCert = subquery.from(GiftCertificate.class);
+        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+            ListJoin<GiftCertificate, Tag> certTags = rootCert.join(GiftCertificate_.tags);
+
+            subquery.where(certTags.get(Tag_.name).in((Object[]) options.getTagNames()));
+            subquery.groupBy(rootCert.get(GiftCertificate_.id));
+            subquery.having(criteriaBuilder.and(criteriaBuilder.equal(criteriaBuilder.count(certTags
+                    .get(GiftCertificate_.id)), options.getTagNames().length)));
+        }
+        subquery.select(rootCert.get(GiftCertificate_.id));
+
+        Root<GiftCertificate> mainRoot = mainQuery.from(GiftCertificate.class);
+        String searchPattern = "%" + options.getSearchParam() + "%";
+        Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get(GiftCertificate_.name), searchPattern),
+                criteriaBuilder.like(mainRoot.get(GiftCertificate_.description), searchPattern));
+        mainQuery.select(criteriaBuilder.count(mainRoot));
+        if (options.getTagNames() != null && options.getTagNames().length > 0) {
+            mainQuery.where(criteriaBuilder.and(mainRoot.get(GiftCertificate_.id).in(subquery), searchPredicate));
+        } else {
+            mainQuery.where(searchPredicate);
+        }
+
+        return entityManager.createQuery(mainQuery).getSingleResult();
     }
 }

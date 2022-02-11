@@ -3,7 +3,6 @@ package com.epam.esm.repository.dao.impl;
 import com.epam.esm.repository.dao.UserDao;
 import com.epam.esm.repository.entity.User;
 import com.epam.esm.repository.exception.DaoException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

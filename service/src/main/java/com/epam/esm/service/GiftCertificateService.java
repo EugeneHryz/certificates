@@ -14,12 +14,11 @@ public interface GiftCertificateService {
 
     GiftCertificateDto getCertificate(int id) throws NoSuchElementException, ServiceException;
 
-    List<GiftCertificateDto> getCertificates(CertificateSearchParameter options, int page, int size) throws ServiceException, InvalidRequestDataException;
+    List<GiftCertificateDto> findCertificates(CertificateSearchParameter options, int page, int size) throws ServiceException, InvalidRequestDataException;
 
     void deleteCertificate(int id) throws ServiceException, NoSuchElementException;
 
     GiftCertificateDto updateCertificate(GiftCertificateDto certDto) throws ServiceException, NoSuchElementException, InvalidRequestDataException;
 
-    long getCertificateCount(CertificateSearchParameter options)
-            throws ServiceException, InvalidRequestDataException;
+    long getCertificateCount(CertificateSearchParameter options) throws ServiceException, InvalidRequestDataException;
 }

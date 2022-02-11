@@ -12,8 +12,7 @@ public interface OrderService {
 
     OrderDto placeOrder(OrderDto orderDto) throws ServiceException, NoSuchElementException;
 
-    List<OrderDto> getUserOrders(int userId, int page, int size)
-            throws ServiceException, InvalidRequestDataException;
+    List<OrderDto> getUserOrders(int userId, int page, int size) throws ServiceException;
 
     OrderDto getUserOrder(int userId, int orderId) throws ServiceException, NoSuchElementException;
 

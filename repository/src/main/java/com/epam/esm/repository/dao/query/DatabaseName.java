@@ -9,8 +9,8 @@ public final class DatabaseName {
     public static final String CERTIFICATE_DESCRIPTION = "description";
     public static final String CERTIFICATE_DURATION = "duration";
     public static final String CERTIFICATE_PRICE = "price";
-    public static final String CERTIFICATE_CREATE_DATE = "create_date";
-    public static final String CERTIFICATE_LAST_UPDATE_DATE = "last_update_date";
+    public static final String CERTIFICATE_CREATED_DATE = "created";
+    public static final String CERTIFICATE_LAST_UPDATED_DATE = "last_updated";
 
     // Tag table
     public static final String TAG_TABLE = "tag";

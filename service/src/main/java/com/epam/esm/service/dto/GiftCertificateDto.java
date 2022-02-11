@@ -1,5 +1,6 @@
 package com.epam.esm.service.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -8,7 +9,7 @@ public class GiftCertificateDto extends AbstractDto {
 
     private String name;
     private String description;
-    private double price;
+    private BigDecimal price;
     private int duration;
     private LocalDateTime created;
     private LocalDateTime lastUpdated;
@@ -17,7 +18,7 @@ public class GiftCertificateDto extends AbstractDto {
     public GiftCertificateDto() {
     }
 
-    public GiftCertificateDto(String name, String description, double price, int duration,
+    public GiftCertificateDto(String name, String description, BigDecimal price, int duration,
                               LocalDateTime created, LocalDateTime lastUpdated, List<TagDto> tags) {
         this.name = name;
         this.description = description;
@@ -44,11 +45,11 @@ public class GiftCertificateDto extends AbstractDto {
         this.description = description;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -89,7 +90,7 @@ public class GiftCertificateDto extends AbstractDto {
         if (this == o) return true;
         if (!(o instanceof GiftCertificateDto)) return false;
         GiftCertificateDto that = (GiftCertificateDto) o;
-        return getId() == that.getId() && Double.compare(that.price, price) == 0
+        return getId() == that.getId() && price.equals(that.price)
                 && duration == that.duration && Objects.equals(name, that.name)
                 && Objects.equals(description, that.description) && Objects.equals(created, that.created)
                 && Objects.equals(lastUpdated, that.lastUpdated)

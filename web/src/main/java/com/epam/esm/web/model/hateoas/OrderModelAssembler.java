@@ -25,7 +25,7 @@ public class OrderModelAssembler implements RepresentationModelAssembler<OrderRe
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                             .getUserOrders(0, 2, entity.getUserId())).withRel("userOrders"));
 
-        } catch (ServiceException | NoSuchElementException | InvalidRequestDataException e) {
+        } catch (ServiceException | NoSuchElementException e) {
             logger.error("error while building links for OrderRequestModel", e);
         }
         return EntityModel.of(entity);

@@ -1,12 +1,8 @@
 package com.epam.esm.web.controller;
 
-import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.service.TagService;
 import com.epam.esm.service.UserService;
-import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.OrderDto;
-import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.dto.UserDto;
 import com.epam.esm.service.impl.OrderServiceImpl;
 import com.epam.esm.web.model.hateoas.OrderModelAssembler;
@@ -20,8 +16,6 @@ import com.epam.esm.web.model.hateoas.pagination.impl.PagedOrderModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.impl.PagedUserModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
@@ -29,10 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,6 +53,14 @@ public class UserController {
         this.conversionService = conversionService;
     }
 
+    /**
+     * get user by id
+     *
+     * @param id user id
+     * @return user representation
+     * @throws ServiceException if an error occurs
+     * @throws NoSuchElementException if user with specified id is not found
+     */
     @GetMapping(value = "/{id}", produces = {"application/json"})
     public EntityModel<UserRequestModel> getUser(@PathVariable int id) throws ServiceException, NoSuchElementException {
         UserDto userDto = userService.getUser(id);
@@ -71,6 +69,14 @@ public class UserController {
         return userAssembler.toModel(userRequestModel);
     }
 
+    /**
+     * get paged users
+     *
+     * @param page page number
+     * @param size number of elements on one page
+     * @return paged list of users with links to navigate through the pages
+     * @throws ServiceException if an error occurs
+     */
     @GetMapping(produces = {"application/json"})
     public PagedModel<EntityModel<UserRequestModel>> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
                                                               @RequestParam(value = "size", defaultValue = "2") int size) throws ServiceException {
@@ -83,15 +89,20 @@ public class UserController {
         return pagedUserAssembler.toPagedModel(usersRequestModel, pageMetadata);
     }
 
+    /**
+     * place order on one gift certificate
+     *
+     * @param orderRequestModel order representation (only certificateId is enough, other values will be ignored)
+     * @param userId user id
+     * @return order representation with links
+     * @throws ServiceException if an error occurs
+     * @throws NoSuchElementException if user or certificate doesn't exist
+     */
     @PostMapping(value = "/{userId}/orders", consumes = {"application/json"})
     public ResponseEntity<?> purchaseCertificate(@RequestBody OrderRequestModel orderRequestModel,
-                                                 @PathVariable int userId, BindingResult bindingResult)
-            throws ServiceException, NoSuchElementException, InvalidRequestDataException {
+                                                 @PathVariable int userId)
+            throws ServiceException, NoSuchElementException {
 
-        if (bindingResult.hasErrors()) {
-            throw new InvalidRequestDataException(extractValidationErrorMessage(bindingResult),
-                    OrderServiceImpl.ORDER_CODE);
-        }
         orderRequestModel.setUserId(userId);
         OrderDto createdOrderDto = orderService.placeOrder(conversionService.convert(orderRequestModel, OrderDto.class));
         OrderRequestModel orderModel = conversionService.convert(createdOrderDto, OrderRequestModel.class);
@@ -101,11 +112,21 @@ public class UserController {
                 .toUri()).body(entityModel);
     }
 
+    /**
+     * get paged orders of one user
+     *
+     * @param page page number
+     * @param size number of elements on one page
+     * @param userId user id
+     * @return paged representations of user orders with links
+     * @throws ServiceException if an error occurs
+     * @throws NoSuchElementException if user with specified id is not found
+     */
     @GetMapping(value = "/{userId}/orders", produces = {"application/json"})
     public PagedModel<EntityModel<OrderRequestModel>> getUserOrders(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                     @RequestParam(value = "size", defaultValue = "2") int size,
                                                                     @PathVariable int userId)
-            throws ServiceException, InvalidRequestDataException, NoSuchElementException {
+            throws ServiceException, NoSuchElementException {
 
         List<OrderDto> ordersDto = orderService.getUserOrders(userId, page, size);
         List<OrderRequestModel> ordersRequestModel = ordersDto.stream()
@@ -116,6 +137,15 @@ public class UserController {
         return pagedOrderAssembler.toPagedModel(ordersRequestModel, pageMetadata, userId);
     }
 
+    /**
+     * get one user order by id
+     *
+     * @param userId user id
+     * @param orderId order id
+     * @return user order representation with links
+     * @throws ServiceException if an error occurs
+     * @throws NoSuchElementException if user or order is not found
+     */
     @GetMapping(value = "/{userId}/orders/{orderId}", produces = {"application/json"})
     public EntityModel<OrderRequestModel> getUserOrder(@PathVariable int userId, @PathVariable int orderId)
             throws ServiceException, NoSuchElementException {
@@ -123,13 +153,5 @@ public class UserController {
         OrderDto orderDto = orderService.getUserOrder(userId, orderId);
         OrderRequestModel orderRequestModel = conversionService.convert(orderDto, OrderRequestModel.class);
         return orderAssembler.toModel(orderRequestModel);
-    }
-
-    // todo:!!
-    private String extractValidationErrorMessage(BindingResult bindingResult) {
-        Optional<String> message = bindingResult.getAllErrors().stream()
-                .map(error -> error.getDefaultMessage()).findFirst();
-
-        return message.orElse("No message");
     }
 }

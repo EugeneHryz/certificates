@@ -97,7 +97,7 @@ public class TestConfig {
 
     private Properties getAdditionalProperties() {
         Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.setProperty("hibernate.hbm2ddl.auto", "none");
 
         return properties;
     }

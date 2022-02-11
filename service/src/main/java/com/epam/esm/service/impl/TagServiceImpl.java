@@ -22,14 +22,12 @@ public class TagServiceImpl implements TagService {
     public static final int TAG_CODE = 2;
 
     private TagDao tagDao;
-    private UserDao userDao;
 
     private ConversionService conversionService;
 
     @Autowired
-    public TagServiceImpl(TagDao tagDao, UserDao userDao, ConversionService conversionService) {
+    public TagServiceImpl(TagDao tagDao, ConversionService conversionService) {
         this.tagDao = tagDao;
-        this.userDao = userDao;
         this.conversionService = conversionService;
     }
 

@@ -2,7 +2,13 @@ package com.epam.esm.repository.entity;
 
 import com.epam.esm.repository.entity.listener.AuditEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Table;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -11,16 +17,16 @@ import java.util.Objects;
 @EntityListeners(AuditEntityListener.class)
 public class Order extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "certificate_id", nullable = false)
     private GiftCertificate certificate;
 
-    @Column(nullable = false)
-    private double total;
+    @Column(nullable = false, precision = 7, scale = 2)
+    private BigDecimal total;
 
     @Column(updatable = false, nullable = false, name = "purchase_date")
     private LocalDateTime purchaseDate;
@@ -28,7 +34,7 @@ public class Order extends AbstractEntity {
     public Order() {
     }
 
-    public Order(User user, GiftCertificate certificate, double total, LocalDateTime date) {
+    public Order(User user, GiftCertificate certificate, BigDecimal total, LocalDateTime date) {
         this.user = user;
         this.certificate = certificate;
         this.total = total;
@@ -51,11 +57,11 @@ public class Order extends AbstractEntity {
         this.certificate = certificate;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
@@ -73,7 +79,7 @@ public class Order extends AbstractEntity {
         if (!(o instanceof Order)) return false;
         Order order = (Order) o;
         return user.equals(order.user) && certificate.equals(order.certificate)
-                && Double.compare(order.total, total) == 0 && getId() == order.getId()
+                && total.compareTo(order.total) == 0 && getId() == order.getId()
                 && purchaseDate.isEqual(order.purchaseDate);
     }
 

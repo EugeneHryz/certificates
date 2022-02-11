@@ -6,7 +6,6 @@ import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.web.controller.CertificateController;
 import com.epam.esm.web.model.GiftCertificateRequestModel;
 import com.epam.esm.web.model.hateoas.CertificateModelAssembler;
-import com.epam.esm.web.model.hateoas.UserModelAssembler;
 import com.epam.esm.web.model.hateoas.pagination.PagedModelAssembler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,23 +64,23 @@ public class PagedCertificateModelAssembler implements PagedModelAssembler<GiftC
         List<Link> links = new ArrayList<>();
 
         links.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
-                .getCertificates(options.getSearchParam(), options.getTagNames(),
+                .findCertificates(options.getSearchParam(), options.getTagNames(),
                         options.getSortBy(), options.getSortOrder(), 0, pageSize)).withRel(IanaLinkRelations.FIRST));
         links.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
-                .getCertificates(options.getSearchParam(), options.getTagNames(),
+                .findCertificates(options.getSearchParam(), options.getTagNames(),
                         options.getSortBy(), options.getSortOrder(), totalPages - 1,
                         pageSize)).withRel(IanaLinkRelations.LAST));
 
         if (currentPage < totalPages && currentPage >= 0) {
             if (currentPage != 0) {
                 links.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
-                        .getCertificates(options.getSearchParam(), options.getTagNames(),
+                        .findCertificates(options.getSearchParam(), options.getTagNames(),
                                 options.getSortBy(), options.getSortOrder(), currentPage - 1,
                                 pageSize)).withRel(IanaLinkRelations.PREV));
             }
             if (currentPage != totalPages - 1) {
                 links.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
-                        .getCertificates(options.getSearchParam(), options.getTagNames(),
+                        .findCertificates(options.getSearchParam(), options.getTagNames(),
                                 options.getSortBy(), options.getSortOrder(), currentPage + 1,
                                 pageSize)).withRel(IanaLinkRelations.NEXT));
             }

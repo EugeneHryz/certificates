@@ -3,7 +3,12 @@ package com.epam.esm.repository.entity;
 import com.epam.esm.repository.entity.listener.EntityAction;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+
 import java.time.LocalDateTime;
 
 @Entity

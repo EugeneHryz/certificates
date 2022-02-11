@@ -2,8 +2,8 @@ package com.epam.esm.repository.dao.impl;
 
 import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
-import static com.epam.esm.repository.dao.query.DatabaseName.*;
 import com.epam.esm.repository.dao.TagDao;
+import com.epam.esm.repository.entity.Tag_;
 import com.epam.esm.repository.exception.DaoException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -26,8 +26,8 @@ public class TagDaoImpl implements TagDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-//    @Value("${dao.findTagOfUserWithHighestSpending}")
-//    private String findTagOfUserWithHighestSpending;
+    @Value("${dao.findTagOfUserWithHighestSpending}")
+    private String findTagOfUserWithHighestSpending;
 
     @Override
     public int create(Tag entity) throws DaoException {
@@ -63,7 +63,7 @@ public class TagDaoImpl implements TagDao {
         CriteriaDelete<Tag> criteriaDelete = criteriaBuilder.createCriteriaDelete(Tag.class);
 
         Root<Tag> rootTag = criteriaDelete.from(Tag.class);
-        criteriaDelete.where(criteriaBuilder.equal(rootTag.get(TAG_ID), id));
+        criteriaDelete.where(criteriaBuilder.equal(rootTag.get(Tag_.id), id));
 
         Query query = entityManager.createQuery(criteriaDelete);
         return query.executeUpdate() > 0;
@@ -80,7 +80,7 @@ public class TagDaoImpl implements TagDao {
         CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
 
         Root<Tag> rootTag = criteriaQuery.from(Tag.class);
-        criteriaQuery.select(rootTag).where(criteriaBuilder.equal(rootTag.get(TAG_NAME), name));
+        criteriaQuery.select(rootTag).where(criteriaBuilder.equal(rootTag.get(Tag_.name), name));
         TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
 
         return query.getResultStream().findFirst();
@@ -104,7 +104,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> findMostWidelyUsedTagOfUserWithHighestSpending() throws DaoException {
-        Query query = entityManager.createNamedQuery("findWidelyUsedTagOfUserWithHighestSpending");
+        Query query = entityManager.createNativeQuery(findTagOfUserWithHighestSpending, Tag.class);
 
         try {
             return Optional.of((Tag) query.getSingleResult());

@@ -53,10 +53,10 @@ public class CertificateController {
     }
 
     /**
-     * creates GiftCertificate and tags if they are passed
+     * creates gift certificate and tags if they are passed
      *
-     * @param gcDto GiftCertificateDto to create
-     * @return newly created GiftCertificateDto
+     * @param gcRequestModel gift certificate to create
+     * @return gift certificate representation with links
      * @throws ServiceException if an error occurs
      */
     @PostMapping(consumes = "application/json")
@@ -77,10 +77,10 @@ public class CertificateController {
     }
 
     /**
-     * get GiftCertificate by id with associated tags
+     * get gift certificate by id with associated tags
      *
-     * @param id GiftCertificate id
-     * @return GiftCertificateDto
+     * @param id certificate id
+     * @return gift certificate representation with links
      * @throws NoSuchElementException if there's no such certificate with specified id
      * @throws ServiceException if an error occurs
      */
@@ -94,17 +94,19 @@ public class CertificateController {
     }
 
     /**
-     * get filtered and sorted list of GiftCertificateDto
+     * find paged, optionally filtered and sorted list of gift certificate representations
      *
      * @param searchParam search certificates by part of name or description
-     * @param tag search certificates by one tag name associated with them
+     * @param tags search certificates by one or many tag names
      * @param sortBy specifies how certificates will be sorted (date - by last update date, name - by name)
      * @param sortOrder specifies sort order (asc - ascending, desc - descending)
-     * @return list of GiftCertificateDto
+     * @param page page number
+     * @param size number of elements on one page
+     * @return paged list of gift certificate representations with links to navigate through the pages
      * @throws ServiceException if an error occurs
      */
     @GetMapping(produces = {"application/json"})
-    public PagedModel<EntityModel<GiftCertificateRequestModel>> getCertificates(
+    public PagedModel<EntityModel<GiftCertificateRequestModel>> findCertificates(
             @RequestParam(value = "searchParam", defaultValue = "") String searchParam,
             @RequestParam(value = "tags", defaultValue = "") String[] tags,
             @RequestParam(value = "sortBy", defaultValue = "date") String sortBy,
@@ -114,7 +116,7 @@ public class CertificateController {
 
         CertificateSearchParameter searchParameter = new CertificateSearchParameter(searchParam, tags, sortBy, sortOrder);
 
-        List<GiftCertificateDto> dtoList = certificateService.getCertificates(searchParameter, page, size);
+        List<GiftCertificateDto> dtoList = certificateService.findCertificates(searchParameter, page, size);
         List<GiftCertificateRequestModel> requestModelList = dtoList.stream()
                 .map(r -> conversionService.convert(r, GiftCertificateRequestModel.class)).collect(Collectors.toList());
 
@@ -139,9 +141,9 @@ public class CertificateController {
     /**
      * update existing gift certificate
      *
-     * @param certDto GiftCertificateDto with values that need to be updated
+     * @param certRequestModel certificate representation with values that need to be updated
      * @param id certificate id
-     * @return updated GiftCertificateDto
+     * @return updated gift certificate representation
      * @throws ServiceException if an error occurs
      * @throws NoSuchElementException if there's no such certificate with specified id
      */

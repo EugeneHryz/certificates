@@ -1,6 +1,10 @@
 package com.epam.esm.repository.entity;
 
-import javax.persistence.*;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+
+import javax.persistence.GenerationType;
 
 @MappedSuperclass
 public abstract class AbstractEntity {

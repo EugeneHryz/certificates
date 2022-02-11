@@ -78,7 +78,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             }
         }
         try {
-            // fixme:
             generatedId = certificateDao.create(conversionService.convert(gcDto, GiftCertificate.class));
             gcDto.setId(generatedId);
 
@@ -103,7 +102,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getCertificates(CertificateSearchParameter options, int pageNumber, int pageSize) throws ServiceException {
+    public List<GiftCertificateDto> findCertificates(CertificateSearchParameter options, int pageNumber, int pageSize) throws ServiceException {
         try {
             List<GiftCertificate> certificates = certificateDao.findCertificates(options, pageSize, pageNumber * pageSize);
 
@@ -169,7 +168,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             if (certDto.getDescription() != null) {
                 newCert.setDescription(certDto.getDescription());
             }
-            if (certDto.getPrice() != 0.0) {
+            if (certDto.getPrice() != null) {
                 newCert.setPrice(certDto.getPrice());
             }
             if (certDto.getDuration() != 0) {
@@ -199,13 +198,4 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
     }
 
-//    private GiftCertificateDto constructCertificateDto(GiftCertificate certificate) throws DaoException {
-//        List<Tag> updatedTags = tagDao.findTagsForCertificate(certificate);
-//        List<TagDto> updatedTagsDto = updatedTags.stream().map(t -> conversionService.convert(t, TagDto.class))
-//                .collect(Collectors.toList());
-//
-//        GiftCertificateDto result = conversionService.convert(certificate, GiftCertificateDto.class);
-//        result.setTags(updatedTagsDto);
-//        return result;
-//    }
 }
