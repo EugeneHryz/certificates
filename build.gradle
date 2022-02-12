@@ -8,8 +8,24 @@ plugins {
 group 'com.epam.esm'
 version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+subprojects {
+
+    apply plugin : 'java'
+    apply plugin : 'war'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+        implementation 'commons-beanutils:commons-beanutils:1.9.4'
+
+        implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.3'
+
+        testImplementation 'org.junit.platform:junit-platform-suite-api:1.8.2'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.3'
+    }
 }
 
 ext {
@@ -19,9 +35,6 @@ ext {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-dependencies {
-
-}
 
 test {
     useJUnitPlatform()

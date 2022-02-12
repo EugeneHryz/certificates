@@ -11,7 +11,13 @@ import com.epam.esm.repository.exception.DaoException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Subquery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -27,14 +33,22 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public int create(GiftCertificate certificate) throws DaoException {
         entityManager.persist(certificate);
 
-        return certificate.getId();
+        try {
+            return certificate.getId();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to create GiftCertificate", e);
+        }
     }
 
     @Override
     public Optional<GiftCertificate> findById(int id) throws DaoException {
         GiftCertificate certificate = entityManager.find(GiftCertificate.class, id);
 
-        return Optional.ofNullable(certificate);
+        try {
+            return Optional.ofNullable(certificate);
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find GiftCertificate by id = " + id, e);
+        }
     }
 
     @Override
@@ -46,7 +60,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         criteriaQuery.select(rootCert).where(criteriaBuilder.equal(rootCert.get(GiftCertificate_.name), name));
         TypedQuery<GiftCertificate> query = entityManager.createQuery(criteriaQuery);
 
-        return query.getResultStream().findFirst();
+        try {
+            return query.getResultStream().findFirst();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find GiftCertificate by name", e);
+        }
     }
 
     @Override
@@ -72,6 +90,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get(GiftCertificate_.name), searchPattern),
                 criteriaBuilder.like(mainRoot.get(GiftCertificate_.description), searchPattern));
         mainQuery.select(mainRoot);
+
         if (options.getTagNames() != null && options.getTagNames().length > 0) {
             mainQuery.where(criteriaBuilder.and(mainRoot.get(GiftCertificate_.id).in(subquery), searchPredicate));
         } else {
@@ -81,7 +100,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         query.setFirstResult(offset);
         query.setMaxResults(limit);
 
-        return query.getResultList();
+        try {
+            return query.getResultList();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find GiftCertificate by parameters", e);
+        }
     }
 
     @Override
@@ -93,7 +116,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         criteriaDelete.where(criteriaBuilder.equal(rootCert.get(GiftCertificate_.id), id));
 
         Query query = entityManager.createQuery(criteriaDelete);
-        return query.executeUpdate() > 0;
+        try {
+            return query.executeUpdate() > 0;
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to delete GiftCertificate by id", e);
+        }
     }
 
     @Override
@@ -107,7 +134,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             certificate.setCreated(cert.getCreated());
             certificate.setLastUpdated(cert.getLastUpdated());
         }
-        return Optional.ofNullable(certificate);
+        try {
+            return Optional.ofNullable(certificate);
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to update GiftCertificate with id = " + cert.getId(), e);
+        }
     }
 
     @Override
@@ -133,12 +164,17 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         Predicate searchPredicate = criteriaBuilder.or(criteriaBuilder.like(mainRoot.get(GiftCertificate_.name), searchPattern),
                 criteriaBuilder.like(mainRoot.get(GiftCertificate_.description), searchPattern));
         mainQuery.select(criteriaBuilder.count(mainRoot));
+
         if (options.getTagNames() != null && options.getTagNames().length > 0) {
             mainQuery.where(criteriaBuilder.and(mainRoot.get(GiftCertificate_.id).in(subquery), searchPredicate));
         } else {
             mainQuery.where(searchPredicate);
         }
 
-        return entityManager.createQuery(mainQuery).getSingleResult();
+        try {
+            return entityManager.createQuery(mainQuery).getSingleResult();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to count certificates filtered by parameters", e);
+        }
     }
 }

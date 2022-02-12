@@ -1,6 +1,5 @@
 package com.epam.esm.web.model.hateoas;
 
-import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
 import com.epam.esm.web.controller.UserController;

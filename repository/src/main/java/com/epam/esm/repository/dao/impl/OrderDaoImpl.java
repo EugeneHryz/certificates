@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -26,9 +27,13 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public int create(Order entity) throws DaoException {
-        entityManager.persist(entity);
+        try {
+            entityManager.persist(entity);
 
-        return entity.getId();
+            return entity.getId();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to create new Order", e);
+        }
     }
 
     @Override
@@ -42,14 +47,22 @@ public class OrderDaoImpl implements OrderDao {
         query.setFirstResult(offset);
         query.setMaxResults(limit);
 
-        return query.getResultList();
+        try {
+            return query.getResultList();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to get user orders", e);
+        }
     }
 
     @Override
     public Optional<Order> findById(int id) throws DaoException {
-        Order order = entityManager.find(Order.class, id);
+        try {
+            Order order = entityManager.find(Order.class, id);
 
-        return Optional.ofNullable(order);
+            return Optional.ofNullable(order);
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find user by id", e);
+        }
     }
 
     @Override
@@ -62,7 +75,11 @@ public class OrderDaoImpl implements OrderDao {
         criteriaQuery.where(criteriaBuilder.equal(orderRoot.get(Order_.user).get(User_.id), userId));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
 
-        return query.getSingleResult();
+        try {
+            return query.getSingleResult();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to count user orders", e);
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.repository.dao.TagDao;
 import com.epam.esm.repository.entity.Tag_;
@@ -10,9 +9,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -31,16 +30,24 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public int create(Tag entity) throws DaoException {
-        entityManager.persist(entity);
+        try {
+            entityManager.persist(entity);
 
-        return entity.getId();
+            return entity.getId();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to create new Tag", e);
+        }
     }
 
     @Override
     public Optional<Tag> findById(int id) throws DaoException {
-        Tag tag = entityManager.find(Tag.class, id);
+        try {
+            Tag tag = entityManager.find(Tag.class, id);
 
-        return Optional.ofNullable(tag);
+            return Optional.ofNullable(tag);
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find Tag by id = " + id, e);
+        }
     }
 
     @Override
@@ -54,7 +61,11 @@ public class TagDaoImpl implements TagDao {
         query.setFirstResult(offset);
         query.setMaxResults(limit);
 
-        return query.getResultList();
+        try {
+            return query.getResultList();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to get tags", e);
+        }
     }
 
     @Override
@@ -64,9 +75,13 @@ public class TagDaoImpl implements TagDao {
 
         Root<Tag> rootTag = criteriaDelete.from(Tag.class);
         criteriaDelete.where(criteriaBuilder.equal(rootTag.get(Tag_.id), id));
-
         Query query = entityManager.createQuery(criteriaDelete);
-        return query.executeUpdate() > 0;
+
+        try {
+            return query.executeUpdate() > 0;
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to delete Tag by id");
+        }
     }
 
     @Override
@@ -83,13 +98,11 @@ public class TagDaoImpl implements TagDao {
         criteriaQuery.select(rootTag).where(criteriaBuilder.equal(rootTag.get(Tag_.name), name));
         TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
 
-        return query.getResultStream().findFirst();
-    }
-
-    @Override
-    public List<Tag> findTagsForCertificate(GiftCertificate cert) throws DaoException {
-        GiftCertificate certificate = entityManager.find(GiftCertificate.class, cert.getId());
-        return certificate.getTags();
+        try {
+            return query.getResultStream().findFirst();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find Tag by name", e);
+        }
     }
 
     @Override
@@ -99,7 +112,12 @@ public class TagDaoImpl implements TagDao {
 
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Tag.class)));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
-        return query.getSingleResult();
+
+        try {
+            return query.getSingleResult();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to count all tags", e);
+        }
     }
 
     @Override
@@ -110,6 +128,8 @@ public class TagDaoImpl implements TagDao {
             return Optional.of((Tag) query.getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find most widely used Tag of a user with highest spending", e);
         }
     }
 }

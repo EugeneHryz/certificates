@@ -92,7 +92,7 @@ public class Order extends AbstractEntity {
     public String toString() {
         return "Order{" +
                 "id=" + getId() +
-                "user=" + user +
+                ", user=" + user +
                 ", certificate=" + certificate +
                 ", total=" + total +
                 ", purchaseDate=" + purchaseDate +

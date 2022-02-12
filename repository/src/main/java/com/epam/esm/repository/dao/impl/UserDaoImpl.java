@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -29,9 +30,13 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findById(int id) throws DaoException {
-        User user = entityManager.find(User.class, id);
+        try {
+            User user = entityManager.find(User.class, id);
 
-        return Optional.ofNullable(user);
+            return Optional.ofNullable(user);
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to find User by id = " + id, e);
+        }
     }
 
     @Override
@@ -49,7 +54,11 @@ public class UserDaoImpl implements UserDao {
         query.setFirstResult(offset);
         query.setMaxResults(limit);
 
-        return query.getResultList();
+        try {
+            return query.getResultList();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to get users", e);
+        }
     }
 
     @Override
@@ -59,7 +68,12 @@ public class UserDaoImpl implements UserDao {
 
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(User.class)));
         TypedQuery<Long> query = entityManager.createQuery(criteriaQuery);
-        return query.getSingleResult();
+
+        try {
+            return query.getSingleResult();
+        } catch (PersistenceException e) {
+            throw new DaoException("Unable to count all users", e);
+        }
     }
 
     @Override

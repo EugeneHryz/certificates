@@ -1,8 +1,8 @@
 package com.epam.esm.web.model.hateoas;
 
-import com.epam.esm.service.exception.impl.InvalidRequestDataException;
 import com.epam.esm.service.exception.impl.NoSuchElementException;
 import com.epam.esm.service.exception.impl.ServiceException;
+import com.epam.esm.web.controller.CertificateController;
 import com.epam.esm.web.controller.UserController;
 import com.epam.esm.web.model.OrderRequestModel;
 import org.slf4j.Logger;
@@ -23,7 +23,9 @@ public class OrderModelAssembler implements RepresentationModelAssembler<OrderRe
             return EntityModel.of(entity, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                             .getUserOrder(entity.getUserId(), entity.getId())).withSelfRel(),
                     WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                            .getUserOrders(0, 2, entity.getUserId())).withRel("userOrders"));
+                            .getUserOrders(0, 2, entity.getUserId())).withRel("userOrders"),
+                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CertificateController.class)
+                            .getGiftCertificate(entity.getCertificateId())).withRel("certificate"));
 
         } catch (ServiceException | NoSuchElementException e) {
             logger.error("error while building links for OrderRequestModel", e);

@@ -47,7 +47,7 @@ public class Tag extends AbstractEntity {
     public String toString() {
         return "Tag{" +
                 "id=" + getId() +
-                "name='" + name + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

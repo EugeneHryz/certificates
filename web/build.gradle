@@ -19,11 +19,8 @@ dependencies {
     implementation project(':service')
     implementation project(':repository')
 
-    implementation 'commons-beanutils:commons-beanutils:1.9.4'
-
     implementation 'org.springframework.boot:spring-boot-starter-hateoas:2.6.3'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
-    implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.3'
 }
 
 test {

@@ -1,7 +1,6 @@
 package com.epam.esm.repository.entity;
 
 import com.epam.esm.repository.entity.listener.EntityAction;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -18,7 +17,6 @@ public class AuditHistory extends AbstractEntity {
     @Column(name = "entity_content", length = 1024)
     private String entityContent;
 
-    @CreatedDate
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
 

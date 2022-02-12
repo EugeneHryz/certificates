@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             if (existingCert.isPresent()) {
                 throw new ServiceException("Certificate with name '" + gcDto.getName() + "' already exists", CERTIFICATE_CODE);
             }
-            LocalDateTime currentDate = LocalDateTime.now();
+            LocalDateTime currentDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             if ((gcDto.getCreated() != null && gcDto.getCreated().isAfter(currentDate))
                     || gcDto.getCreated() == null || gcDto.getLastUpdated() == null) {
 
@@ -175,7 +176,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 newCert.setDuration(certDto.getDuration());
             }
             // lastUpdated date is automatically updated
-            newCert.setLastUpdated(LocalDateTime.now());
+            newCert.setLastUpdated(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
             Optional<GiftCertificate> updatedCert = certificateDao.update(newCert);
             if (updatedCert.isPresent()) {
                 return conversionService.convert(updatedCert.get(), GiftCertificateDto.class);

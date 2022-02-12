@@ -1,11 +1,11 @@
-package com.epam.esm.web.error;
+package com.epam.esm.web.model;
 
-public class Error {
+public class ErrorModel {
 
     private final int errorCode;
     private final String errorMessage;
 
-    public Error(int errorCode, String errorMessage) {
+    public ErrorModel(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }

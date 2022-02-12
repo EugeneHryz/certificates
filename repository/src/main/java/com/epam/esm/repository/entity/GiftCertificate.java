@@ -138,7 +138,7 @@ public class GiftCertificate extends AbstractEntity {
     public String toString() {
         return "GiftCertificate{" +
                 "id=" + getId() +
-                "name='" + name + '\'' +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", duration=" + duration +

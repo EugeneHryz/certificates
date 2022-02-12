@@ -10,9 +10,6 @@ import java.util.Objects;
 public class UserRequestModel {
 
     private int id;
-
-    @NotNull(message = "user name cannot be null")
-    @Size(min = 3, max = 50, message = "user name must be between 3 and 50 characters in length")
     private String name;
 
     public UserRequestModel() {

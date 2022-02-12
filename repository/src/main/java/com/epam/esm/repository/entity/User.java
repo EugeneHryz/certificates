@@ -46,7 +46,7 @@ public class User extends AbstractEntity {
     public String toString() {
         return "User{" +
                 "id=" + getId() +
-                "name='" + name + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }
