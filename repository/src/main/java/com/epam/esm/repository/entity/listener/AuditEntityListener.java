@@ -3,7 +3,12 @@ package com.epam.esm.repository.entity.listener;
 import com.epam.esm.repository.entity.AbstractEntity;
 import com.epam.esm.repository.entity.AuditHistory;
 
-import javax.persistence.*;
+import javax.persistence.PreRemove;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 public class AuditEntityListener {
 

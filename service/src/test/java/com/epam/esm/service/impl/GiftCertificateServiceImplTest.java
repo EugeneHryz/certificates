@@ -17,14 +17,12 @@ import com.epam.esm.service.exception.impl.ServiceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -38,7 +36,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {PersistenceConfig.class, TestConfig.class})
 public class GiftCertificateServiceImplTest {
 
@@ -119,7 +116,7 @@ public class GiftCertificateServiceImplTest {
     }
 
     @Test
-    public void createCertificateThatAlreadyExists() throws DaoException, ServiceException, InvalidRequestDataException {
+    public void createCertificateThatAlreadyExists() throws DaoException, InvalidRequestDataException {
         GiftCertificateDto certificateDto = new GiftCertificateDto("Free shopping", "good certificate", BigDecimal.valueOf(45.0), 20,
                 LocalDateTime.parse("2010-09-03T13:09:30"), LocalDateTime.parse("2010-09-03T13:09:30"), null);
         certificateDto.setId(5);

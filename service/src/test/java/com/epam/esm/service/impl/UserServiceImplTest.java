@@ -12,14 +12,12 @@ import com.epam.esm.service.exception.impl.ServiceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,6 @@ import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {PersistenceConfig.class, TestConfig.class})
 public class UserServiceImplTest {
 
