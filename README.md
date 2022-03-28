@@ -26,4 +26,4 @@ The app has a layered structure with three layers: repository - for data access,
 
 # DB schema diagram
 
-![schema](readme-media/schema.png "schema")
+![schema](readme-media/db_schema.png "schema")
